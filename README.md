@@ -94,6 +94,16 @@ Backend configuration is read from environment variables (no silent fallbacks â€
 
 ---
 
+## Team
+
+| GitHub | Role |
+|---|---|
+| [@stephfurry](https://github.com/stephfurry) | Co-founder |
+| [@dogmond](https://github.com/dogmond) | Co-founder |
+| [@iguodoggo](https://github.com/iguodoggo) | Co-founder |
+
+---
+
 ## Contributing
 
 1. Fork the repo and create a feature branch.
