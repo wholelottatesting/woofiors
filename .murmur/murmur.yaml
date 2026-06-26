@@ -1,0 +1,6 @@
+"tenant":
+  "org": "wholelottatesting"
+  "provider": "github_app"
+"api":
+  "address": "murmur-api.nonprod.private.prasso.ai:9090"
+  "ca_cert": ""
