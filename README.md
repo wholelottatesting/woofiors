@@ -1,36 +1,37 @@
-# woofiors
+# 🐕 Woofiors
 
-> Latest scores, news, and schedules for the Dubs.
+> Latest scores, news, and schedules for the Golden State Warriors — with a good boy's twist.
 
-A monorepo housing a Go backend and React frontend that aggregates Golden State Warriors scores, upcoming schedules, and news from public APIs into a single clean dashboard.
+**Woofiors** is a fan companion for the Golden State Warriors. Whether Steph Furry is raining threes from the parking lot or the Dubs are chasing another banner, Woofiors keeps you fetching the freshest scores, news, and schedules — all wrapped in an unapologetically playful dog theme. 🏀🐾
 
 ---
 
-## What it does
+## Features
 
-| Feature | Detail |
-|---|---|
-| **Live & recent scores** | Game results with box-score summaries |
-| **Upcoming schedule** | Next games with tip-off times and opponents |
-| **News feed** | Latest Warriors headlines pulled from public sports news APIs |
+- 🏀 **Latest Scores** — Live and recent game results. Did the Dubs win? Woof yeah.
+- 📰 **News** — The latest Warriors headlines, rounded up so you never miss a beat (or a bark).
+- 📅 **Schedules** — Upcoming games so you always know when it's time to howl at the arena.
+- 🐶 **Dog Theme Everywhere** — Because a Warriors app is better with a wagging tail. Meet the starting lineup: Steph Furry, Draymond Grrreen, Klay Thompup, and Coach Steve Kennel.
 
 ---
 
 ## Architecture
 
+This is a monorepo housing both the backend and the web app:
+
 ```
 woofiors/
-├── backend/        # Go HTTP API server
-│   ├── cmd/        # Entry points (server)
-│   ├── internal/   # Business logic, API clients, handlers
-│   └── ...
-└── frontend/       # React single-page app
-    ├── src/
-    │   ├── components/
-    │   ├── hooks/
-    │   └── ...
-    └── ...
+├── backend/    # Go API — fetches & serves Warriors scores, news, and schedules
+│   ├── cmd/    # Entry points (server)
+│   └── internal/  # Business logic, API clients, handlers
+├── web/        # React web app — the fan-facing frontend
+│   └── src/
+│       ├── components/
+│       └── hooks/
+└── README.md   # You are here 🐾
 ```
+
+> Note: the `backend/` and `web/` directories are still being scaffolded. This README describes the intended shape of the kennel.
 
 The backend proxies and caches requests to public sports APIs — keeping API keys off the client and responses snappy. The frontend talks only to the backend.
 
@@ -44,14 +45,14 @@ The backend proxies and caches requests to public sports APIs — keeping API ke
 
 ---
 
-## Getting started
+## Getting Started
 
 ### Prerequisites
 
 - Go 1.22+
 - Node 20+ / npm 10+
 
-### Backend
+### Backend (Go)
 
 ```bash
 cd backend
@@ -60,10 +61,10 @@ go run ./cmd/server
 # → http://localhost:8080
 ```
 
-### Frontend
+### Web app (React)
 
 ```bash
-cd frontend
+cd web
 npm install
 npm run dev
 # → http://localhost:5173
@@ -74,7 +75,7 @@ npm run dev
 ## Development
 
 ```
-make dev       # start both backend and frontend in watch mode
+make dev       # start both backend and web app in watch mode
 make test      # run all tests (Go + Vitest)
 make lint      # golangci-lint + eslint
 make build     # production binaries
@@ -106,7 +107,13 @@ Backend configuration is read from environment variables (no silent fallbacks �
 
 ## Contributing
 
+Good dogs welcome. Keep the code clean, the puns groan-worthy, and the tail wagging. 🐕
+
 1. Fork the repo and create a feature branch.
 2. Write tests first — requirements live in tests.
 3. Run `make test && make lint` before pushing.
 4. Open a PR against `main`.
+
+---
+
+Go Woofiors! 💙💛
