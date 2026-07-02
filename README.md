@@ -26,7 +26,7 @@ woofiors/
 └── README.md   # You are here 🐾
 ```
 
-> Note: the `backend/` and `web/` directories are still being scaffolded. This README describes the intended shape of the kennel.
+> Note: the `backend/` directory now has a runnable Go scaffold (see [backend/README.md](backend/README.md)); the `web/` app is still being scaffolded. This README describes the intended shape of the kennel.
 
 ### Backend (Go)
 
