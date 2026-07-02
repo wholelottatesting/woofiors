@@ -22,6 +22,13 @@ func (fakeService) Scores(context.Context) ([]warriors.Score, error)  { return n
 func (fakeService) News(context.Context) ([]warriors.NewsItem, error) { return nil, errBoom }
 func (fakeService) Schedule(context.Context) ([]warriors.Game, error) { return nil, errBoom }
 
+// emptyService is a warriors.Service that succeeds with no data (nil slices).
+type emptyService struct{}
+
+func (emptyService) Scores(context.Context) ([]warriors.Score, error)  { return nil, nil }
+func (emptyService) News(context.Context) ([]warriors.NewsItem, error) { return nil, nil }
+func (emptyService) Schedule(context.Context) ([]warriors.Game, error) { return nil, nil }
+
 func get(t *testing.T, h http.Handler, method, path string) *httptest.ResponseRecorder {
 	t.Helper()
 	rec := httptest.NewRecorder()
@@ -73,6 +80,23 @@ func TestRoutes_ServiceError(t *testing.T) {
 		}
 		if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil || body.Error == "" {
 			t.Errorf("%s: want JSON error envelope, got %q (err=%v)", path, rec.Body.String(), err)
+		}
+	}
+}
+
+// Requirement: an empty collection serializes as a JSON array ([]), never
+// null. A provider returning a nil slice must not change the wire contract —
+// clients iterate the response, and null would break them.
+func TestRoutes_EmptyIsArrayNotNull(t *testing.T) {
+	srv := NewServer(emptyService{})
+
+	for _, path := range []string{"/api/scores", "/api/news", "/api/schedule"} {
+		rec := get(t, srv, http.MethodGet, path)
+		if rec.Code != http.StatusOK {
+			t.Errorf("%s: status = %d, want 200", path, rec.Code)
+		}
+		if got := rec.Body.String(); got != "[]" {
+			t.Errorf("%s: body = %q, want %q", path, got, "[]")
 		}
 	}
 }

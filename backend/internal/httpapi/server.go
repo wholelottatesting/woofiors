@@ -45,6 +45,11 @@ func handleList[T any](fetch func(context.Context) ([]T, error)) http.HandlerFun
 			writeError(w, http.StatusBadGateway, "failed to fetch Warriors data")
 			return
 		}
+		if items == nil {
+			// A nil slice marshals to JSON null; the wire contract is that a
+			// collection is always an array, so an empty result is [] not null.
+			items = []T{}
+		}
 		writeJSON(w, http.StatusOK, items)
 	}
 }
