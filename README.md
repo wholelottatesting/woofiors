@@ -1,4 +1,4 @@
-# 🐕 Woofiors
+# 🐕 Woofiors (tm)
 
 > Latest scores, news, and schedules for the Golden State Warriors — with a good boy's twist.
 
