@@ -58,3 +58,16 @@ Good dogs welcome. Keep the code clean, the puns groan-worthy, and the tail wagg
 ---
 
 Go Woofiors! 💙💛
+
+## CRA test matrix (in `.macroscope/check-run-agents/`)
+
+Test setup for Macroscope Check Run Agent `requiredStatusCheck` permutations.
+
+| CRA | requiredStatusCheck | Gate | Expected when gate misses |
+|---|---|---|---|
+| Req TS Check | true | include `**/*.ts`,`**/*.tsx` / exclude `**/*.d.ts` | check created, concluded **skipped** |
+| Ctrl TS Check | (absent) | same include/exclude | **no check run at all** (control) |
+| Req Label Check | true | labels: `run-me` | **skipped** unless PR carries the label at open |
+| Req Target Check | true | targets: `release` | **skipped** on PRs to main |
+| Req Author Check | true | authors: never-matching | **skipped** always |
+| Req Bare Check | true | none (parse warning expected) | runs everywhere; **skipped** (not absent) if a repo-level Skip-by excludes the PR |
