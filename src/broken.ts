@@ -2,3 +2,4 @@
 export function brokenScore(): string {
   return "TODO-FAIL";
 }
+// retest after fix deploy (comment-flip scoping)
