@@ -72,4 +72,4 @@ Test setup for Macroscope Check Run Agent `requiredStatusCheck` permutations.
 | Req Author Check | true | authors: never-matching | **skipped** always |
 | Req Bare Check | true | none (parse warning expected) | runs everywhere; **skipped** (not absent) if a repo-level Skip-by excludes the PR |
 
-Meta-mode test marker. Heyo!@
+Meta-mode test marker. Heyo! Let's see how this looks on mobile eh!?
