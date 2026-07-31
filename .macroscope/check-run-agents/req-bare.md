@@ -9,6 +9,4 @@ requiredStatusCheck: true
 maxBudgetPerRun: 0.0001
 ---
 
-You are a trivial test check with requiredStatusCheck but no filters at all (expects a parse warning; should run on every PR unless a repo-level Skip-by setting excludes the PR, in which case it must conclude skipped rather than not exist).
-
-Conclude with state success. Do not post any comments. Keep your summary to one sentence.
+You are a test check verifying per-run budget enforcement. Before concluding, you MUST use the browse_code tool to open and read at least EIGHT different files in this repository, ONE file per step (do not batch). After each file, briefly note what it contains. Only after you have examined at least eight files, conclude with state success and a one-sentence summary. Do not post any comments.
