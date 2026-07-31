@@ -1,0 +1,1 @@
+second budget-stop trigger (cap now 0.0001)
