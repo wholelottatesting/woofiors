@@ -118,3 +118,5 @@ Line 37: this paragraph exists purely to push README.md over the 1 KB correctnes
 Line 38: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
 Line 39: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
 Line 40: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+
+Another line to re-trigger correctness now that max-runs is off; README stays well over the 1KB cap.
