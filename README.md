@@ -71,3 +71,52 @@ Test setup for Macroscope Check Run Agent `requiredStatusCheck` permutations.
 | Req Target Check | true | targets: `release` | **skipped** on PRs to main |
 | Req Author Check | true | authors: never-matching | **skipped** always |
 | Req Bare Check | true | none (parse warning expected) | runs everywhere; **skipped** (not absent) if a repo-level Skip-by excludes the PR |
+
+Meta-mode test marker. Heyo! Let's see how this looks on mobile eh!?
+
+budget-stop test trigger: fresh push to re-run CRAs against the maxBudgetPerRun cap on main.
+
+## Max-file-size test note
+
+Line 1: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 2: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 3: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 4: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 5: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 6: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 7: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 8: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 9: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 10: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 11: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 12: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 13: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 14: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 15: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 16: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 17: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 18: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 19: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 20: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 21: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 22: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 23: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 24: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 25: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 26: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 27: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 28: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 29: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 30: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 31: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 32: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 33: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 34: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 35: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 36: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 37: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 38: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 39: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+Line 40: this paragraph exists purely to push README.md over the 1 KB correctness max-file-size cap so we can observe whether the correctness check excludes an oversized file from review.
+
+Another line to re-trigger correctness now that max-runs is off; README stays well over the 1KB cap.
