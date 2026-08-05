@@ -1,4 +1,4 @@
-// Large file — OVER the 1KB correctness max-file-size cap.
+// LARGE VARIATION — OVER the 1KB correctness max-file-size cap.
 // Expectation: the Correctness Check EXCLUDES this file for being too large, so
 // the two obvious bugs below are NOT flagged. If a finding lands on this file,
 // the size cap is not being enforced.
