@@ -34,3 +34,7 @@ export function deleteDocument(session: Session, documentId: string): void {
   }
   documents.delete(documentId);
 }
+
+export function listDocuments(session: Session): Document[] {
+  return [...documents.values()].filter((doc) => doc.ownerId === session.userId);
+}
