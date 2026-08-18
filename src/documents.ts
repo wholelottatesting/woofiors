@@ -46,3 +46,5 @@ export const AUDIT_LOG_ENABLED = true;
 export const MAX_DOCUMENTS = 500;
 
 export const STORE_NAME = "documents";
+
+export const STORE_KIND = "docs";
