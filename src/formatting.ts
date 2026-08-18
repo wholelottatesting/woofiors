@@ -26,3 +26,8 @@ export function documentSummary(doc: Document): string {
   const n = doc.body.length;
   return `${documentLabel(doc)}: ${n} characters`;
 }
+
+/** Returns the owner id for display. */
+export function ownerLabel(doc: Document): string {
+  return doc.ownerId;
+}
