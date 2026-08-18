@@ -15,3 +15,5 @@ Repository maintainers may adjust these guidelines as the codebase evolves.
 Questions about these rules go to the platform team.
 
 Reviewers should read this file before approving policy changes.
+
+Escalate policy questions to the platform team.
