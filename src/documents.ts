@@ -50,3 +50,5 @@ export const STORE_NAME = "documents";
 export const STORE_KIND = "docs";
 
 export const STORE_REGION = "us";
+
+export const STORE_TIER = "standard";
