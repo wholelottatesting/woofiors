@@ -77,3 +77,5 @@ Test setup for Macroscope Check Run Agent `requiredStatusCheck` permutations.
 Run the type checker before opening a pull request.
 
 Use `npm run typecheck` before pushing.
+
+Open an issue before large refactors.
