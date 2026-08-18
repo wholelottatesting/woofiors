@@ -42,3 +42,5 @@ export function listDocuments(session: Session): Document[] {
 export const DOCUMENT_STORE_VERSION = 2;
 
 export const AUDIT_LOG_ENABLED = true;
+
+export const MAX_DOCUMENTS = 500;
