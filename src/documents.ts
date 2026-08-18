@@ -48,3 +48,5 @@ export const MAX_DOCUMENTS = 500;
 export const STORE_NAME = "documents";
 
 export const STORE_KIND = "docs";
+
+export const STORE_REGION = "us";
