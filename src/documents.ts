@@ -38,3 +38,5 @@ export function deleteDocument(session: Session, documentId: string): void {
 export function listDocuments(session: Session): Document[] {
   return [...documents.values()].filter((doc) => doc.ownerId === session.userId);
 }
+
+export const DOCUMENT_STORE_VERSION = 2;
