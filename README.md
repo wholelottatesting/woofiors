@@ -71,3 +71,4 @@ Test setup for Macroscope Check Run Agent `requiredStatusCheck` permutations.
 | Req Target Check | true | targets: `release` | **skipped** on PRs to main |
 | Req Author Check | true | authors: never-matching | **skipped** always |
 | Req Bare Check | true | none (parse warning expected) | runs everywhere; **skipped** (not absent) if a repo-level Skip-by excludes the PR |
+third-party gate test 1787162856
