@@ -1,0 +1,14 @@
+name: Third Party CI
+
+on:
+  pull_request:
+
+jobs:
+  tp-pass:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "deliberately succeeds"; exit 0
+  tp-fail:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "deliberately fails"; exit 1
