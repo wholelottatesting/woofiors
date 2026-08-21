@@ -12,3 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "deliberately fails"; exit 1
+
+  # Reproduces the pydantic shape: a CONDITIONAL downstream job. GitHub cannot
+  # publish tp-late's check run until tp-detect finishes and the `if` resolves,
+  # so tp-late is absent from the Checks API for ~3 minutes after the push.
+  # That is what the 60s default discovery window cannot survive.
+  tp-detect:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - run: sleep 180
+      - id: decide
+        run: echo "run=true" >> "$GITHUB_OUTPUT"
+
+  tp-late:
+    needs: tp-detect
+    if: needs.tp-detect.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "published late, then succeeds"; exit 0
