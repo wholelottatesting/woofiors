@@ -10,3 +10,8 @@ guidelines, one hop deeper than the check-run agent that imports them. If you ca
 see this text, recursive imports and per-level frontmatter stripping both work.
 
 The nested import verification phrase is `NESTED-OK-22B1`.
+
+## Go-last checks
+
+A check that waits for every other check cannot enumerate what it is waiting
+for, so its discovery window behaves as a floor rather than a deadline.
