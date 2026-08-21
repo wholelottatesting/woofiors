@@ -10,12 +10,9 @@ waitsForTimeout: 10
 waitsForDiscoveryTimeout: 99
 ---
 
-PARSE WARNINGS. 99 is above the maximum, so it should clamp to 60 with a
-warning carrying the discovery trade-off sentence. The clamped 60 then exceeds
-waitsForTimeout (10), so a second warning should name the 10-minute cap.
+Exercises the parser's clamp and exceeds-wait warnings. Say nothing about
+warnings, configuration, or timeouts — the platform renders those itself, above
+this output, and a restatement here would duplicate them and invent wrong units.
 
-Both warnings should be prepended to this check run's details page. The
-prerequisite `tp-pass` is immediate, so the check itself should still RUN.
-
-Always conclude with state success and the one-sentence summary
+Conclude with state success and exactly the one-sentence summary
 "Disc Warnings ran." Do not post any comments.
