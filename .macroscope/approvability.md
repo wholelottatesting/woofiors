@@ -1,8 +1,4 @@
-# Approvability guidelines
-
-Correctness findings are advisory.
-
-```yaml
+---
 neverApprove:
   - "src/generated/mod_0000.txt"
   - "src/generated/mod_0001.txt"
@@ -28,4 +24,78 @@ neverApprove:
   - "src/generated/mod_0021.txt"
   - "src/generated/mod_0022.txt"
   - "src/generated/mod_0023.txt"
-```
+  - "src/generated/mod_0024.txt"
+  - "src/generated/mod_0025.txt"
+  - "src/generated/mod_0026.txt"
+  - "src/generated/mod_0027.txt"
+  - "src/generated/mod_0028.txt"
+  - "src/generated/mod_0029.txt"
+  - "src/generated/mod_0030.txt"
+  - "src/generated/mod_0031.txt"
+  - "src/generated/mod_0032.txt"
+  - "src/generated/mod_0033.txt"
+  - "src/generated/mod_0034.txt"
+  - "src/generated/mod_0035.txt"
+  - "src/generated/mod_0036.txt"
+  - "src/generated/mod_0037.txt"
+  - "src/generated/mod_0038.txt"
+  - "src/generated/mod_0039.txt"
+  - "src/generated/mod_0040.txt"
+  - "src/generated/mod_0041.txt"
+  - "src/generated/mod_0042.txt"
+  - "src/generated/mod_0043.txt"
+  - "src/generated/mod_0044.txt"
+  - "src/generated/mod_0045.txt"
+  - "src/generated/mod_0046.txt"
+  - "src/generated/mod_0047.txt"
+  - "src/generated/mod_0048.txt"
+  - "src/generated/mod_0049.txt"
+  - "src/generated/mod_0050.txt"
+  - "src/generated/mod_0051.txt"
+  - "src/generated/mod_0052.txt"
+  - "src/generated/mod_0053.txt"
+  - "src/generated/mod_0054.txt"
+  - "src/generated/mod_0055.txt"
+  - "src/generated/mod_0056.txt"
+  - "src/generated/mod_0057.txt"
+  - "src/generated/mod_0058.txt"
+  - "src/generated/mod_0059.txt"
+  - "src/generated/mod_0060.txt"
+  - "src/generated/mod_0061.txt"
+  - "src/generated/mod_0062.txt"
+  - "src/generated/mod_0063.txt"
+  - "src/generated/mod_0064.txt"
+  - "src/generated/mod_0065.txt"
+  - "src/generated/mod_0066.txt"
+  - "src/generated/mod_0067.txt"
+  - "src/generated/mod_0068.txt"
+  - "src/generated/mod_0069.txt"
+  - "src/generated/mod_0070.txt"
+  - "src/generated/mod_0071.txt"
+  - "src/generated/mod_0072.txt"
+  - "src/generated/mod_0073.txt"
+  - "src/generated/mod_0074.txt"
+  - "src/generated/mod_0075.txt"
+  - "src/generated/mod_0076.txt"
+  - "src/generated/mod_0077.txt"
+  - "src/generated/mod_0078.txt"
+  - "src/generated/mod_0079.txt"
+  - "src/generated/mod_0080.txt"
+  - "src/generated/mod_0081.txt"
+  - "src/generated/mod_0082.txt"
+  - "src/generated/mod_0083.txt"
+  - "src/generated/mod_0084.txt"
+  - "src/generated/mod_0085.txt"
+  - "src/generated/mod_0086.txt"
+  - "src/generated/mod_0087.txt"
+  - "src/generated/mod_0088.txt"
+  - "src/generated/mod_0089.txt"
+---
+
+# Approvability guidelines
+
+Correctness findings are advisory.
+
+The neverApprove list above names 90 individual generated modules so that a
+pull request touching all of them matches far more patterns than the reasoning
+field can name, exercising the per-pattern budget.
