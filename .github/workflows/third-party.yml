@@ -4,6 +4,14 @@ on:
   pull_request:
 
 jobs:
+  correctness-prerequisite:
+    name: correctness-prerequisite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read smoke-test gate
+        run: grep -qx pass .correctness-prerequisite
+
   tp-pass:
     runs-on: ubuntu-latest
     steps:
