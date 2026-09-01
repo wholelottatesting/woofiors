@@ -1,0 +1,35 @@
+name: Check Run Completed Webhook Smoke
+
+on:
+  pull_request:
+
+permissions:
+  checks: write
+  contents: read
+
+jobs:
+  target:
+    name: webhook-target
+    runs-on: ubuntu-latest
+    steps:
+      - name: Finish with failure
+        run: exit 1
+
+  rewrite:
+    name: rewrite-completed-target
+    needs: target
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rewrite the completed target to success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          target_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs" \
+            --jq '.jobs[] | select(.name == "webhook-target") | .id')"
+          test -n "$target_id"
+          echo "target_check_run_id=$target_id"
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/check-runs/${target_id}" \
+            -f status=completed \
+            -f conclusion=success \
+            -f completed_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
