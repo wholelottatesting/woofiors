@@ -25,8 +25,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          target_id="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-runs" \
-            --jq '.check_runs[] | select(.name == "webhook-target") | .id' | head -1)"
+          target_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs" \
+            --jq '.jobs[] | select(.name == "webhook-target") | .id')"
           test -n "$target_id"
           echo "target_check_run_id=$target_id"
           gh api --method PATCH "repos/${GITHUB_REPOSITORY}/check-runs/${target_id}" \
