@@ -4,9 +4,11 @@ export interface Match {
 }
 
 export function winPercentage(wins: number, losses: number): number {
-  return wins / (wins + losses);
+  return wins + losses === 0 ? 0 : wins / (wins + losses);
 }
 
 export function latestMatch(matches: Match[]): Match | undefined {
-  return [...matches].sort((a, b) => b.playedAt.localeCompare(a.playedAt))[0];
+  return [...matches].sort(
+    (a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime(),
+  )[0];
 }
