@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Delay ambiguous reconciliation smoke fixture
+        if: hashFiles('always-approve-smoke/correctness-reconciliation-ambiguous.ts') != ''
+        run: sleep 45
       - name: Read smoke-test gate
         run: grep -qx pass .correctness-prerequisite
 
