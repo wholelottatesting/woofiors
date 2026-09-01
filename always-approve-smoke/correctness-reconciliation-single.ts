@@ -1,1 +1,3 @@
-export const CORRECTNESS_RECONCILIATION_SMOKE = true;
+export function add(left: number, right: number): number {
+  return left + right;
+}
