@@ -1,0 +1,4 @@
+workspace-limit smoke push 2
+workspace-limit smoke push 3
+workspace-limit smoke gate assertion
+workspace-limit smoke details-page assertion
