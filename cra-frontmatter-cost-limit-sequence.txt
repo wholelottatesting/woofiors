@@ -1,1 +1,2 @@
 frontmatter-limit smoke push 1
+frontmatter-limit smoke push 2
