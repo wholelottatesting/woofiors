@@ -1,0 +1,3 @@
+frontmatter-limit smoke push 1
+frontmatter-limit smoke push 2
+frontmatter-limit smoke details-page assertion
