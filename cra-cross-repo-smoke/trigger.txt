@@ -1,0 +1,1 @@
+Cross-repository author authorization denial smoke trigger.
