@@ -70,4 +70,4 @@ jobs:
           test "${second_status}" = "202"
           test "$(jq -er '.runId' second-body.json)" = "${first_run_id}"
           jq -e '.jobToken | length > 0' second-body.json >/dev/null
-          grep -Eiq '^x-macroscope-idempotent-replay: true\r?$' second-headers.txt
+          tr -d '\r' <second-headers.txt | grep -Eiq '^x-macroscope-idempotent-replay: true$'
