@@ -1,0 +1,45 @@
+name: Macroscope Actions Smoke
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/macroscope-actions-smoke.yml"
+      - ".macroscope/check-run-agents/github-actions/**"
+      - "src/**"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  pr-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - id: macroscope
+        uses: prassoai/macroscope-actions/run@2bee831ee8b484ed6e608a36138518933eabff10 # sync from prassoai/back@5dd574b4
+        with:
+          repository: ${{ github.repository }}
+          agent: Actions PR Metadata Smoke
+          commit: ${{ github.event.pull_request.head.sha }}
+          pull-request: ${{ github.event.pull_request.number }}
+          fail-on: failure
+          timeout: "600"
+          additional-instructions: |
+            This is a post-merge smoke test for the reusable Macroscope action.
+
+  full-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - id: macroscope
+        uses: prassoai/macroscope-actions/run@2bee831ee8b484ed6e608a36138518933eabff10 # sync from prassoai/back@5dd574b4
+        with:
+          repository: ${{ github.repository }}
+          agent: Actions Full Diff Smoke
+          commit: ${{ github.event.pull_request.head.sha }}
+          base: ${{ github.event.pull_request.base.sha }}
+          fail-on: failure
+          timeout: "600"
+          additional-instructions: |
+            This is a post-merge smoke test for the reusable Macroscope action.
