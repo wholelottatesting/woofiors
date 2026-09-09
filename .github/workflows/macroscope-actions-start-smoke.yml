@@ -40,7 +40,7 @@ jobs:
             --arg agent "GitHub Actions Start Smoke" \
             --arg commit "${TARGET_COMMIT}" \
             --argjson pullRequest "${TARGET_PR}" \
-            --arg idempotencyDiscriminator "pr-metadata-postdeploy-v1" \
+            --arg idempotencyDiscriminator "full-diff-postdeploy-v1" \
             '{repository: $repository, agent: $agent, commit: $commit, pullRequest: $pullRequest, idempotencyDiscriminator: $idempotencyDiscriminator}')"
 
           first_status="$(curl --silent --show-error \
