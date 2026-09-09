@@ -25,7 +25,7 @@ jobs:
           token="$(jq -er '.value' <<<"${response}")"
           echo "token=${token}" >>"${GITHUB_OUTPUT}"
 
-      - name: Start run and verify idempotent replay
+      - name: Verify repository kill switch rejects the run
         env:
           MACROSCOPE_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
           MACROSCOPE_API_URL: https://primary.lb.webhook.staging.back.nonprod.prasso.ai/api/v1/github-actions/agent-runs
@@ -42,34 +42,17 @@ jobs:
             --arg base "${TARGET_BASE}" \
             --arg commit "${TARGET_COMMIT}" \
             --argjson pullRequest "${TARGET_PR}" \
-            --arg idempotencyDiscriminator "full-diff-postdeploy-v2" \
+            --arg idempotencyDiscriminator "kill-switch-enabled-20260909" \
             '{repository: $repository, agent: $agent, base: $base, commit: $commit, pullRequest: $pullRequest, idempotencyDiscriminator: $idempotencyDiscriminator}')"
 
-          first_status="$(curl --silent --show-error \
-            --dump-header first-headers.txt \
-            --output first-body.json \
+          status="$(curl --silent --show-error \
+            --output body.json \
             --write-out '%{http_code}' \
             --header "Authorization: Bearer ${MACROSCOPE_OIDC_TOKEN}" \
             --header "Content-Type: application/json" \
             --data "${request}" \
             "${MACROSCOPE_API_URL}")"
-          echo "First response: HTTP ${first_status}"
-          jq . first-body.json
-          test "${first_status}" = "202"
-          first_run_id="$(jq -er '.runId' first-body.json)"
-          jq -e '.jobToken | length > 0' first-body.json >/dev/null
-
-          second_status="$(curl --silent --show-error \
-            --dump-header second-headers.txt \
-            --output second-body.json \
-            --write-out '%{http_code}' \
-            --header "Authorization: Bearer ${MACROSCOPE_OIDC_TOKEN}" \
-            --header "Content-Type: application/json" \
-            --data "${request}" \
-            "${MACROSCOPE_API_URL}")"
-          echo "Replay response: HTTP ${second_status}"
-          jq . second-body.json
-          test "${second_status}" = "202"
-          test "$(jq -er '.runId' second-body.json)" = "${first_run_id}"
-          jq -e '.jobToken | length > 0' second-body.json >/dev/null
-          tr -d '\r' <second-headers.txt | grep -Eiq '^x-macroscope-idempotent-replay: true$'
+          echo "Response: HTTP ${status}"
+          jq . body.json
+          test "${status}" = "403"
+          jq -er '.error | contains("GitHub Actions agent runs are not enabled for repository")' body.json >/dev/null
