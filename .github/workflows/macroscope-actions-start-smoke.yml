@@ -29,6 +29,7 @@ jobs:
         env:
           MACROSCOPE_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
           MACROSCOPE_API_URL: https://primary.lb.webhook.staging.back.nonprod.prasso.ai/api/v1/github-actions/agent-runs
+          TARGET_BASE: ${{ github.event.pull_request.base.sha }}
           TARGET_COMMIT: ${{ github.event.pull_request.head.sha }}
           TARGET_PR: ${{ github.event.pull_request.number }}
         shell: bash
@@ -38,10 +39,11 @@ jobs:
           request="$(jq -n \
             --arg repository "${GITHUB_REPOSITORY}" \
             --arg agent "GitHub Actions Start Smoke" \
+            --arg base "${TARGET_BASE}" \
             --arg commit "${TARGET_COMMIT}" \
             --argjson pullRequest "${TARGET_PR}" \
-            --arg idempotencyDiscriminator "full-diff-postdeploy-v1" \
-            '{repository: $repository, agent: $agent, commit: $commit, pullRequest: $pullRequest, idempotencyDiscriminator: $idempotencyDiscriminator}')"
+            --arg idempotencyDiscriminator "full-diff-postdeploy-v2" \
+            '{repository: $repository, agent: $agent, base: $base, commit: $commit, pullRequest: $pullRequest, idempotencyDiscriminator: $idempotencyDiscriminator}')"
 
           first_status="$(curl --silent --show-error \
             --dump-header first-headers.txt \
