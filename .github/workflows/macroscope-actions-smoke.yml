@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - id: macroscope
-        uses: prassoai/macroscope-actions/run@2bee831ee8b484ed6e608a36138518933eabff10 # sync from prassoai/back@5dd574b4
+        uses: prassoai/macroscope-actions/run@0016c000f394c8403a62b376005be58956ae93d7 # sync from prassoai/back@1ae2ecee
         with:
           repository: ${{ github.repository }}
           agent: Actions PR Metadata Smoke
@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - id: macroscope
-        uses: prassoai/macroscope-actions/run@2bee831ee8b484ed6e608a36138518933eabff10 # sync from prassoai/back@5dd574b4
+        uses: prassoai/macroscope-actions/run@0016c000f394c8403a62b376005be58956ae93d7 # sync from prassoai/back@1ae2ecee
         with:
           repository: ${{ github.repository }}
           agent: Actions Full Diff Smoke
