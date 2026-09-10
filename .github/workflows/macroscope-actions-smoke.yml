@@ -19,6 +19,7 @@ jobs:
       - id: macroscope
         uses: prassoai/macroscope-actions/run@0016c000f394c8403a62b376005be58956ae93d7 # sync from prassoai/back@1ae2ecee
         with:
+          api-url: https://primary.lb.webhook.staging.back.nonprod.prasso.ai
           repository: ${{ github.repository }}
           agent: Actions PR Metadata Smoke
           commit: ${{ github.event.pull_request.head.sha }}
@@ -35,6 +36,7 @@ jobs:
       - id: macroscope
         uses: prassoai/macroscope-actions/run@0016c000f394c8403a62b376005be58956ae93d7 # sync from prassoai/back@1ae2ecee
         with:
+          api-url: https://primary.lb.webhook.staging.back.nonprod.prasso.ai
           repository: ${{ github.repository }}
           agent: Actions Full Diff Smoke
           commit: ${{ github.event.pull_request.head.sha }}
