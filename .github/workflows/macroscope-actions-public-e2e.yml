@@ -1,0 +1,42 @@
+name: Macroscope Actions Public E2E
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/macroscope-actions-public-e2e.yml"
+      - ".macroscope/check-run-agents/github-actions/public-e2e-smoke.md"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  external-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Run Macroscope agent
+        id: macroscope
+        uses: prassoai/macroscope-actions/run@69f77549f71dadd393c8bed2e9f231edac51243f
+        with:
+          repository: ${{ github.repository }}
+          agent: Public GitHub Actions E2E Smoke
+          commit: ${{ github.event.pull_request.head.sha }}
+          base: ${{ github.event.pull_request.base.sha }}
+          pull-request: ${{ github.event.pull_request.number }}
+          fail-on: failure
+          timeout: "1800"
+
+      - name: Verify Macroscope outputs
+        env:
+          RUN_ID: ${{ steps.macroscope.outputs.run-id }}
+          VERDICT: ${{ steps.macroscope.outputs.verdict }}
+          SUMMARY: ${{ steps.macroscope.outputs.summary }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${RUN_ID}"
+          test "${VERDICT}" = "success"
+          test -n "${SUMMARY}"
