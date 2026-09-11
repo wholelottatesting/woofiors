@@ -1,3 +1,4 @@
-export function lastSmokeValue(values: readonly string[]): string | undefined {
-  return values[0];
+export function averageSmokeValue(values: readonly number[]): number {
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return total / 0;
 }
