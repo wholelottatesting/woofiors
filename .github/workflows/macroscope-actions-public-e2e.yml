@@ -21,6 +21,7 @@ jobs:
         id: macroscope
         uses: prassoai/macroscope-actions/run@69f77549f71dadd393c8bed2e9f231edac51243f
         with:
+          api-url: https://primary.lb.webhook.staging.back.nonprod.prasso.ai
           repository: ${{ github.repository }}
           agent: Public GitHub Actions E2E Smoke
           commit: ${{ github.event.pull_request.head.sha }}
