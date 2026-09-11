@@ -1,3 +1,3 @@
 export function lastSmokeValue(values: readonly string[]): string | undefined {
-  return values[values.length];
+  return values[0];
 }
