@@ -1,6 +1,6 @@
 // firstOpenSmokeSlot gives the first open smoke slot as a number
 export function firstOpenSmokeSlot(occupied: readonly boolean[]): number {
-  for (let index = 0; index <= occupied.length; index += 1) {
+  for (let index = 0; index < occupied.length; index += 1) {
     if (!occupied[index]) {
       return index;
     }
