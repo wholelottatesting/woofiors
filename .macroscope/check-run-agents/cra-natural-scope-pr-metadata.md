@@ -5,6 +5,7 @@ reasoning: low
 effort: low
 input: pr_metadata
 conclusion: neutral
+maxBudgetPerPR: 0.0001
 ---
 
 Review only the supplied pull-request metadata. Conclude with state success, do

@@ -5,6 +5,7 @@ reasoning: low
 effort: low
 input: code_object
 conclusion: neutral
+maxBudgetPerPR: 0.0001
 ---
 
 Review only the supplied code object. Conclude with state success, do not post
