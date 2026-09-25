@@ -1,4 +1,4 @@
 export function summarizeNaturalScopeBaseline(values: number[]): number {
-  const initialTotal = 0;
+  const initialTotal: number = 0;
   return values.reduce((total, value) => total + value, initialTotal);
 }
