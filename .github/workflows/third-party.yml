@@ -17,6 +17,7 @@ jobs:
     steps:
       - run: echo "deliberately succeeds"; exit 0
   tp-fail:
+    if: false # skipped for native merge smoke test
     runs-on: ubuntu-latest
     steps:
       - run: echo "deliberately fails"; exit 1
