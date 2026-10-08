@@ -55,10 +55,6 @@ npm run dev
 
 Good dogs welcome. Keep the code clean, the puns groan-worthy, and the tail wagging. 🐕
 
----
-
-Go Woofiors! 💙💛
-
 ## CRA test matrix (in `.macroscope/check-run-agents/`)
 
 Test setup for Macroscope Check Run Agent `requiredStatusCheck` permutations.
@@ -71,3 +67,7 @@ Test setup for Macroscope Check Run Agent `requiredStatusCheck` permutations.
 | Req Target Check | true | targets: `release` | **skipped** on PRs to main |
 | Req Author Check | true | authors: never-matching | **skipped** always |
 | Req Bare Check | true | none (parse warning expected) | runs everywhere; **skipped** (not absent) if a repo-level Skip-by excludes the PR |
+
+---
+
+Go Woofiors! 💙💛
