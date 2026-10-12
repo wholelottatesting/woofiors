@@ -4,6 +4,10 @@
 
 **Woofiors** is a fan companion for the Golden State Warriors. Whether Steph Furry is raining threes from the parking lot or the Dubs are chasing another banner, Woofiors keeps you fetching the freshest scores, news, and schedules — all wrapped in an unapologetically playful dog theme. 🏀🐾
 
+<p dir="rtl" lang="he">שלום, עולם!</p>
+
+*Shalom, olam!* — "Hello, world!" in Hebrew. 🐾
+
 ## What is this?
 
 Woofiors is a small monorepo pairing a **Go backend** with a **React web app**. The backend does the digging (fetching and serving Warriors data), and the frontend puts on the good boy face (rendering it for fans).
