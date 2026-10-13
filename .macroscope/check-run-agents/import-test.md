@@ -1,9 +1,13 @@
 ---
-title: Import Test Check
+title: Config Loader Smoke 20261013 Import
 model: claude-sonnet-4-6
 reasoning: low
 effort: low
 input: pr_metadata
+include:
+  - "src/config-loader-smoke-20261013/**"
+exclude:
+  - "**/*.d.ts"
 ---
 
 You are a trivial test check that verifies the `@path` file-import feature. You
