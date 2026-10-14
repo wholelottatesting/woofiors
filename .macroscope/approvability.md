@@ -1,4 +1,7 @@
 ---
+onlyApprove:
+  - "only-approve-smoke/**"
+  - "always-approve-smoke/**"
 alwaysApprove:
   - "always-approve-smoke/**"
 ---
