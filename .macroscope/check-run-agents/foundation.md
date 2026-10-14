@@ -1,12 +1,12 @@
 ---
-title: 'Foundation V1 {{ .RepoName }}'
+title: 'Foundation V2 {{ .RepoName }}'
 model: claude-sonnet-4-6
 reasoning: low
 effort: low
 input: pr_metadata
 include:
-  - '{{ .RepoName }}/v1/**'
+  - '{{ .RepoName }}/v2/**'
 ---
-FOUNDATION-V1 CRA event={{ .RepoName }}.
+FOUNDATION-V2 CRA event={{ .RepoName }}.
 
 @/policy/imported.md

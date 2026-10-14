@@ -1,1 +1,1 @@
-FOUNDATION-V1 SOURCE-REPO-IMPORT event={{ .RepoName }}.
+FOUNDATION-V2 SOURCE-REPO-IMPORT event={{ .RepoName }}.

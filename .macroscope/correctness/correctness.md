@@ -1,7 +1,7 @@
 ---
 include:
-  - '{{ .RepoName }}/v1/**'
+  - '{{ .RepoName }}/v2/**'
 waitsFor:
-  - '{{ .RepoName }}-v1-ready'
+  - '{{ .RepoName }}-v2-ready'
 ---
-FOUNDATION-V1 correctness event={{ .RepoName }}.
+FOUNDATION-V2 correctness event={{ .RepoName }}.

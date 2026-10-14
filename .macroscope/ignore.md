@@ -1,4 +1,4 @@
 ---
 ignoreTests: true
 ---
-foundation-v1-generated/**
+foundation-v2-generated/**
