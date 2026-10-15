@@ -7,3 +7,5 @@ alwaysApprove:
 ---
 
 Approve pull requests that are routine and low risk.
+
+Policy smoke marker: {{ .RepoName }}
