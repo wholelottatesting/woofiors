@@ -9,3 +9,9 @@ alwaysApprove:
 Approve pull requests that are routine and low risk.
 
 Policy smoke marker: {{ .RepoName }}
+
+{{ if eq .RepoName "co-webhook-test-aw" }}
+Policy conditional smoke: matched co-webhook-test-aw.
+{{ else }}
+Policy conditional smoke: unexpected repository {{ .RepoName }}.
+{{ end }}
