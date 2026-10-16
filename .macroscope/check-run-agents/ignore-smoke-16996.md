@@ -3,8 +3,6 @@ title: Ignore Smoke 16996
 model: claude-sonnet-4-6
 reasoning: low
 effort: low
-waitsFor:
-  - "ignore-smoke-pin-gate"
 exclude:
   - ".github/**"
 ---
