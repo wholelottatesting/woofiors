@@ -2,4 +2,4 @@
 ignoreTests: false
 ---
 
-src/ignore16996/policy-excluded.go
+src/ignore16996/reviewed.go
