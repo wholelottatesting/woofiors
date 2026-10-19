@@ -1,9 +1,6 @@
 ---
 waitsFor:
-  - "smoke-17084-build"
-  - "smoke-17084-integration"
-  - "smoke-17084-never-lint"
-  - "smoke-17084-never-security"
+  - "*"
 waitsForTimeout: 2
 waitsForDiscoveryTimeout: 1
 onlyApprove:
