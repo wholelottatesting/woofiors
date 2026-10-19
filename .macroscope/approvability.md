@@ -1,8 +1,4 @@
 ---
-waitsFor:
-  - "*"
-waitsForTimeout: 2
-waitsForDiscoveryTimeout: 1
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"
@@ -10,7 +6,12 @@ alwaysApprove:
   - "always-approve-smoke/**"
 ---
 
-Approve routine documentation-only pull requests unless one of the following rules applies.
+Approve pull requests that are routine and low risk.
 
-Require human approval if any check selected by waitsFor failed, never appeared, or had not finished when waiting stopped.
-Documentation under only-approve-smoke/human-review-17084/ requires maintainer sign-off and therefore requires human approval independently of CI.
+Policy smoke marker: {{ .RepoName }}
+
+{{ if eq .RepoName "co-webhook-test-aw" }}
+Policy conditional smoke: matched co-webhook-test-aw.
+{{ else }}
+Policy conditional smoke: unexpected repository {{ .RepoName }}.
+{{ end }}
