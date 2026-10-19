@@ -1,0 +1,18 @@
+name: Approvability 17001 smoke CI
+on:
+  pull_request:
+jobs:
+  smoke-17001-ci:
+    if: startsWith(github.head_ref, 'smoke/approvability-17001-')
+    name: smoke-17001-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Controlled smoke outcome
+        env:
+          SMOKE_BRANCH: ${{ github.head_ref }}
+        run: |
+          case "$SMOKE_BRANCH" in
+            *-running) sleep 240 ;;
+            *-failed) exit 1 ;;
+            *) echo "Smoke CI passed" ;;
+          esac
