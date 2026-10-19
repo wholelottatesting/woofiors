@@ -15,5 +15,5 @@ alwaysApprove:
 
 Approve routine documentation-only pull requests unless one of the following rules applies.
 
-CI completion and CI outcomes are informational, not conditions of approval.
+Require human approval if any check selected by waitsFor failed, never appeared, or had not finished when waiting stopped.
 Documentation under only-approve-smoke/human-review-17084/ requires maintainer sign-off and therefore requires human approval independently of CI.
