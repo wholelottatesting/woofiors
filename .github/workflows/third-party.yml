@@ -19,4 +19,4 @@ jobs:
   tp-fail:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "17001 smoke baseline succeeds"; exit 0
+      - run: echo "deliberately fails"; exit 1
