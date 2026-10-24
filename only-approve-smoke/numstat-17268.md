@@ -10,3 +10,4 @@ Documentation fixture line 7.
 Documentation fixture line 8.
 Documentation fixture line 9.
 Documentation fixture line 10.
+One additional smoke verification line.
