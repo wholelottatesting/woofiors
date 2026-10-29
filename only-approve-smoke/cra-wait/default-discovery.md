@@ -1,3 +1,3 @@
 # Default CRA wait discovery smoke
 
-Temporary staging smoke test; do not merge.
+Fresh run after enabling Check Run Agents; do not merge.
