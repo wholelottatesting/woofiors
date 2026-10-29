@@ -1,0 +1,1 @@
+Staging smoke: cancel the Actions invocation before approval.
