@@ -1,7 +1,4 @@
 ---
-waitsFor: ["actions-cancellation-hold-smoke"]
-waitsForTimeout: 6
-waitsForDiscoveryTimeout: 5
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"
