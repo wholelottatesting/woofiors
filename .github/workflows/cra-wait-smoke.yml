@@ -1,0 +1,24 @@
+name: CRA Wait Smoke Prerequisite
+
+on:
+  pull_request:
+    paths:
+      - 'only-approve-smoke/cra-wait/**'
+
+permissions:
+  contents: read
+
+jobs:
+  prerequisite:
+    name: cra-wait-smoke-prerequisite
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hold prerequisite for the smoke-test interval
+        shell: bash
+        run: |
+          delay=$(cat only-approve-smoke/cra-wait/delay-seconds.txt)
+          [[ "$delay" =~ ^[0-9]+$ ]] && (( delay <= 900 ))
+          echo "Holding the prerequisite for $delay seconds"
+          sleep "$delay"
