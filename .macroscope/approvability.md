@@ -1,6 +1,4 @@
 ---
-waitsForTimeout: 3
-waitsForDiscoveryTimeout: 2
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"
