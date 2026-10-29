@@ -1,0 +1,1 @@
+Staging smoke: cancel while a deliberate prerequisite hold is pending.
