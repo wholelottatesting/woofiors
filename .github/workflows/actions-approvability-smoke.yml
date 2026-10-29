@@ -1,0 +1,49 @@
+name: Actions Approvability Smoke
+on:
+  workflow_dispatch:
+    inputs:
+      pull-request:
+        description: Smoke PR number
+        required: true
+        type: string
+      commit:
+        description: Smoke PR head SHA
+        required: true
+        type: string
+      base:
+        description: Smoke PR base SHA
+        required: true
+        type: string
+      additional-instructions:
+        description: Leave empty except for the rejection smoke
+        required: false
+        default: ''
+        type: string
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  approvability:
+    name: Actions Approvability Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Run Approvability
+        id: macroscope
+        uses: prassoai/macroscope-actions/run@4c0a42e0d7fa1a19d6907a265a81122abf80c4a9
+        with:
+          api-url: https://primary.lb.webhook.staging.back.nonprod.prasso.ai
+          repository: ${{ github.repository }}
+          review: approvability
+          commit: ${{ inputs.commit }}
+          base: ${{ inputs.base }}
+          pull-request: ${{ inputs.pull-request }}
+          additional-instructions: ${{ inputs.additional-instructions }}
+          timeout: '1200'
+      - name: Show outputs
+        if: always()
+        env:
+          RUN_ID: ${{ steps.macroscope.outputs.run-id }}
+          VERDICT: ${{ steps.macroscope.outputs.verdict }}
+          SUMMARY: ${{ steps.macroscope.outputs.summary }}
+        run: jq -n --arg runId "$RUN_ID" --arg verdict "$VERDICT" --arg summary "$SUMMARY" '{runId:$runId,verdict:$verdict,summary:$summary}'
