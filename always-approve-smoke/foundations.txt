@@ -1,0 +1,2 @@
+Disposable staging foundations smoke: scopes.
+This fixture contains no product code and is not intended to merge.
