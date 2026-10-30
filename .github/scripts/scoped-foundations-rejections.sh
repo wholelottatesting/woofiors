@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -euo pipefail
 mkdir -p smoke-evidence
 oidc_response=$(curl --fail --silent --show-error -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=macroscope")
