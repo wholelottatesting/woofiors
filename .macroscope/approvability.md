@@ -2,6 +2,8 @@
 conclusion: failure
 waitsFor:
   - "Scoped Regression Prerequisite"
+neverApprove:
+  - "only-approve-smoke/foundations.txt"
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"
