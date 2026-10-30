@@ -1,2 +1,0 @@
-Disposable staging foundations smoke: fail.
-This fixture contains no product code and is not intended to merge.

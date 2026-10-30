@@ -1,0 +1,2 @@
+Disposable staging foundations smoke: fail.
+This fixture exercises a failed required check, not the alwaysApprove bypass.
