@@ -1,4 +1,7 @@
 ---
+conclusion: failure
+waitsFor:
+  - "Scoped Regression Prerequisite"
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"

@@ -1,0 +1,87 @@
+name: Scoped Foundations Regression Smoke
+run-name: Foundations smoke ${{ inputs.scenario }} PR ${{ inputs.pull-request }}
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        type: choice
+        options: [pass, fail, cra, scopes]
+        required: true
+      pull-request:
+        type: string
+        required: true
+      commit:
+        type: string
+        required: true
+      base:
+        type: string
+        required: true
+permissions:
+  contents: read
+  id-token: write
+  checks: read
+  pull-requests: read
+jobs:
+  prerequisite:
+    name: Scoped Regression Prerequisite
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          SCENARIO: ${{ inputs.scenario }}
+        run: |
+          echo "Smoke prerequisite for $SCENARIO"
+          test "$SCENARIO" != fail
+  review:
+    name: Foundations smoke ${{ inputs.scenario }}
+    needs: prerequisite
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject scoped requests before ordinary omission control
+        if: inputs.scenario == 'scopes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SMOKE_PR: ${{ inputs.pull-request }}
+          SMOKE_COMMIT: ${{ inputs.commit }}
+          SMOKE_BASE: ${{ inputs.base }}
+        run: bash .github/scripts/scoped-foundations-rejections.sh
+      - name: Run ordinary review
+        id: macroscope
+        continue-on-error: true
+        uses: prassoai/macroscope-actions/run@e35c6564cdc24478514026a57f323f523796d5c2
+        with:
+          api-url: https://primary.lb.webhook.staging.back.nonprod.prasso.ai
+          repository: ${{ github.repository }}
+          review: ${{ (inputs.scenario == 'cra' || inputs.scenario == 'scopes') && 'cra' || 'approvability' }}
+          agent: ${{ (inputs.scenario == 'cra' || inputs.scenario == 'scopes') && 'Foundations Smoke CRA' || '' }}
+          commit: ${{ inputs.commit }}
+          base: ${{ inputs.base }}
+          pull-request: ${{ inputs.pull-request }}
+          timeout: '1200'
+      - name: Capture outputs and actual summary files
+        if: always()
+        env:
+          SCENARIO: ${{ inputs.scenario }}
+          RUN_ID: ${{ steps.macroscope.outputs.run-id }}
+          VERDICT: ${{ steps.macroscope.outputs.verdict }}
+          SUMMARY: ${{ steps.macroscope.outputs.summary }}
+          OUTCOME: ${{ steps.macroscope.outcome }}
+        run: |
+          mkdir -p smoke-evidence
+          jq -n --arg scenario "$SCENARIO" --arg runId "$RUN_ID" --arg verdict "$VERDICT" --arg summary "$SUMMARY" --arg outcome "$OUTCOME" '{scenario:$scenario,runId:$runId,verdict:$verdict,summary:$summary,outcome:$outcome}' | tee smoke-evidence/outputs.json
+          for summary_file in "$(dirname "$GITHUB_STEP_SUMMARY")"/step_summary_*; do
+            if test -s "$summary_file"; then cp "$summary_file" "smoke-evidence/$(basename "$summary_file").md"; fi
+          done
+          expected=success
+          if test "$SCENARIO" = fail; then expected=failure; fi
+          test "$VERDICT" = "$expected"
+          test "$OUTCOME" = "$expected"
+          test -n "$RUN_ID"
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-evidence-${{ inputs.scenario }}
+          path: smoke-evidence/
