@@ -1,0 +1,2 @@
+Disposable staging foundations smoke: pass.
+This fixture contains no product code and is not intended to merge.
