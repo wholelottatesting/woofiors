@@ -2,8 +2,6 @@
 conclusion: failure
 waitsFor:
   - "Scoped Regression Prerequisite"
-neverApprove:
-  - "only-approve-smoke/foundations.txt"
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"
@@ -12,6 +10,11 @@ alwaysApprove:
 ---
 
 Approve pull requests that are routine and low risk.
+
+For changes to `only-approve-smoke/foundations.txt`, a successful
+`Scoped Regression Prerequisite` check is a mandatory condition of approval.
+If that check fails, the pull request is not approvable and requires human
+review, even if the changed file is otherwise routine and low risk.
 
 Policy smoke marker: {{ .RepoName }}
 
