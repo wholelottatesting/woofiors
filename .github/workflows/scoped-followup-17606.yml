@@ -2,7 +2,7 @@ name: Scoped bounded follow-up 17606
 
 on:
   pull_request:
-    branches: [smoke/bounded-v2-17606-20261031-base]
+    branches: [smoke/bounded-v3-17606-20261031-base]
     types: [opened]
 
 permissions:
@@ -13,8 +13,8 @@ jobs:
     if: >-
       github.repository == 'wholelottatesting/woofiors' &&
       github.event.pull_request.head.repo.full_name == 'wholelottatesting/woofiors' &&
-      github.event.pull_request.head.ref == 'smoke/bounded-v2-17606-20261031-head'
-    runs-on: scoped-bounded-v2-17606-20261031
+      github.event.pull_request.head.ref == 'smoke/bounded-v3-17606-20261031-head'
+    runs-on: scoped-bounded-v3-17606-20261031
     timeout-minutes: 40
     permissions:
       contents: read
