@@ -1,2 +1,2 @@
-status: ready
-description: Initial isolated local-build fixture.
+status: blocked
+description: This independent record intentionally violates the trusted status policy.
