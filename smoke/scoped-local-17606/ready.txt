@@ -1,0 +1,2 @@
+status: ready
+description: Initial isolated local-build fixture.

@@ -1,0 +1,99 @@
+name: Scoped local build 17606
+
+on:
+  pull_request:
+    branches:
+      - smoke/scoped-local-17606-20261031-base
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  scoped-local:
+    if: >-
+      github.repository == 'wholelottatesting/woofiors' &&
+      github.event.pull_request.head.repo.full_name == 'wholelottatesting/woofiors' &&
+      github.event.pull_request.head.ref == 'smoke/scoped-local-17606-20261031-head'
+    runs-on: scoped-local-17606-20261031
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      CURL_CA_BUNDLE: /home/murmur/workspace/scoped-e2e-verification/local-runner/tls/ca-bundle.pem
+      SSL_CERT_FILE: /home/murmur/workspace/scoped-e2e-verification/local-runner/tls/ca-bundle.pem
+      NODE_EXTRA_CA_CERTS: /home/murmur/workspace/scoped-e2e-verification/local-runner/tls/ca.pem
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify local build and trusted HTTPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          source=/home/murmur/workspace/back
+          test "$(git -C "$source" rev-parse HEAD)" = 4e75543824011ef8bd0eaced1364aae6a048bbac
+          git -C "$source" diff --exit-code HEAD -- macroscope-actions
+          test ! -e .local-macroscope-actions
+          ln -s "$source/macroscope-actions" .local-macroscope-actions
+          curl --silent --show-error --fail https://127.0.0.1:18443/ready
+          sha256sum "$source/macroscope-actions/run/action.yml" "$source/macroscope-actions/run/run.sh" "$source/macroscope-actions/lib/action_runtime.sh"
+      - name: Run two scoped checks through the local build
+        id: two
+        uses: ./.local-macroscope-actions/run
+        with:
+          api-url: https://127.0.0.1:18443
+          repository: wholelottatesting/woofiors
+          review: approvability
+          commit: ${{ github.event.pull_request.head.sha }}
+          base: ${{ github.event.pull_request.base.sha }}
+          pull-request: ${{ github.event.pull_request.number }}
+          fail-on: never
+          timeout: "900"
+          scopes: >-
+            [{"name":"Ready","checkName":"Local 17606 Ready","analysis":"parent","files":["smoke/scoped-local-17606/ready.txt"]},
+             {"name":"Blocked","checkName":"Local 17606 Blocked","analysis":"parent","files":["smoke/scoped-local-17606/blocked.txt"]}]
+      - name: Verify two-scope artifact
+        shell: bash
+        env:
+          SMOKE_RUN_ID: ${{ steps.two.outputs.run-id }}
+        run: bash .github/scripts/verify-scoped-local-17606.sh two
+      - name: Run one scoped check through the local build
+        id: one
+        uses: ./.local-macroscope-actions/run
+        with:
+          api-url: https://127.0.0.1:18443
+          repository: wholelottatesting/woofiors
+          review: approvability
+          commit: ${{ github.event.pull_request.head.sha }}
+          base: ${{ github.event.pull_request.base.sha }}
+          pull-request: ${{ github.event.pull_request.number }}
+          fail-on: never
+          timeout: "900"
+          scopes: >-
+            [{"name":"Ready","checkName":"Local 17606 Ready single","analysis":"parent","files":["smoke/scoped-local-17606/ready.txt"]}]
+      - name: Verify one-scope artifact
+        shell: bash
+        env:
+          SMOKE_RUN_ID: ${{ steps.one.outputs.run-id }}
+        run: bash .github/scripts/verify-scoped-local-17606.sh one
+      - name: Collect rendered summaries
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/scoped-local-evidence/summaries"
+          while IFS= read -r -d '' summary; do
+            if grep -q '^## Macroscope result$' "$summary"; then
+              cp "$summary" "$RUNNER_TEMP/scoped-local-evidence/summaries/$(basename "$summary").md"
+            fi
+          done < <(find "$RUNNER_TEMP/_runner_file_commands" -type f -name 'step_summary_*' -print0)
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: scoped-local-17606-evidence
+          path: ${{ runner.temp }}/scoped-local-evidence/
+          if-no-files-found: error
+          retention-days: 3
