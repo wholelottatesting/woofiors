@@ -1,0 +1,95 @@
+name: Scoped bounded follow-up 17606
+
+on:
+  pull_request:
+    branches: [smoke/scoped-followup-17606-20261031-base]
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-followup:
+    if: >-
+      github.repository == 'wholelottatesting/woofiors' &&
+      github.event.pull_request.head.repo.full_name == 'wholelottatesting/woofiors' &&
+      github.event.pull_request.head.ref == 'smoke/scoped-followup-17606-20261031-head'
+    runs-on: scoped-followup-17606-20261031
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      CURL_CA_BUNDLE: /home/murmur/workspace/scoped-e2e-verification/followup-runner/tls/ca-bundle.pem
+      SSL_CERT_FILE: /home/murmur/workspace/scoped-e2e-verification/followup-runner/tls/ca-bundle.pem
+      NODE_EXTRA_CA_CERTS: /home/murmur/workspace/scoped-e2e-verification/followup-runner/tls/ca.pem
+      SMOKE_HEAD: ${{ github.event.pull_request.head.sha }}
+      SMOKE_BASE: ${{ github.event.pull_request.base.sha }}
+      SMOKE_PR: ${{ github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify local source and HTTPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          source=/home/murmur/workspace/back
+          test "$(git -C "$source" rev-parse HEAD)" = 4e75543824011ef8bd0eaced1364aae6a048bbac
+          git -C "$source" diff --exit-code HEAD -- macroscope-actions
+          ln -s "$source/macroscope-actions" .local-macroscope-actions
+          curl --silent --show-error --fail https://127.0.0.1:18443/ready
+      - name: Scoped success and authenticated retry/rejoin
+        shell: bash
+        run: bash .github/scripts/scoped-followup-17606.sh success
+      - name: Ordinary whole-PR Approvability control
+        id: ordinary
+        uses: ./.local-macroscope-actions/run
+        with:
+          api-url: https://127.0.0.1:18443
+          repository: wholelottatesting/woofiors
+          review: approvability
+          commit: ${{ env.SMOKE_HEAD }}
+          base: ${{ env.SMOKE_BASE }}
+          pull-request: ${{ env.SMOKE_PR }}
+          fail-on: neutral
+          timeout: "900"
+      - name: Ordinary CRA control
+        id: cra
+        uses: ./.local-macroscope-actions/run
+        with:
+          api-url: https://127.0.0.1:18443
+          repository: wholelottatesting/woofiors
+          review: cra
+          agent: Bounded local 17606
+          commit: ${{ env.SMOKE_HEAD }}
+          base: ${{ env.SMOKE_BASE }}
+          pull-request: ${{ env.SMOKE_PR }}
+          fail-on: neutral
+          timeout: "600"
+      - name: Freshness revocation preserves completed checks
+        shell: bash
+        run: bash .github/scripts/scoped-followup-17606.sh freshness
+      - name: Collect published outputs and summaries
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/scoped-followup-evidence"
+          mkdir -p "$evidence/results" "$evidence/summaries"
+          while IFS= read -r -d '' result; do
+            cp "$result" "$evidence/results/$(basename "$(dirname "$result")").json"
+          done < <(find "$RUNNER_TEMP" -path '*/macroscope-result-*/result.json' -print0)
+          while IFS= read -r -d '' summary; do
+            if grep -q '^## Macroscope result$' "$summary"; then
+              cp "$summary" "$evidence/summaries/$(basename "$summary").md"
+            fi
+          done < <(find "$RUNNER_TEMP/_runner_file_commands" -name 'step_summary_*' -print0)
+      - name: Upload bounded follow-up evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: scoped-followup-17606-evidence
+          path: ${{ runner.temp }}/scoped-followup-evidence/
+          if-no-files-found: error
+          retention-days: 3
