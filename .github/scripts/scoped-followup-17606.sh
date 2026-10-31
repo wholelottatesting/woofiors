@@ -42,15 +42,25 @@ else
 fi
 
 poll_run "$run_id" "$token" "$private/poll.json" "$private/poll.headers" "$private/poll.config" "$deadline"
+if [[ "$scenario" == freshness ]]; then
+  for attempt in {1..30}; do
+    if jq -e 'all(.scopedReview.scopes[]; .publicationStatus=="confirmed") and .scopedReview.parentSummary.publicationStatus=="confirmed"' "$private/poll.json" >/dev/null; then
+      break
+    fi
+    sleep 2
+    poll_run "$run_id" "$token" "$private/poll.json" "$private/poll.headers" "$private/poll.config" "$deadline"
+  done
+fi
 cp "$private/poll.json" "$evidence/${scenario}.json"
 emit_terminal_outputs "$private/poll.json" "$run_id"
 if [[ "$scenario" == success ]]; then
   jq -e '.status == "succeeded" and .verdict == "success" and (.scopedReview.scopes | length == 1) and (.scopedReview.scopes[0] | .conclusion == "success" and .publicationStatus == "confirmed" and .publishedConclusion == "success")' "$private/poll.json" >/dev/null
+  jq -e '.scopedReview.parentSummary.checkName=="Macroscope - Approvability Check (Scopes)" and (.summary|contains("Invoked via GitHub Actions."))' "$private/poll.json" >/dev/null
   start_run "$oidc" "$payload" "$private/replay.json" "$private/replay.headers" "$private/replay.config" "$deadline"
   test "$(jq -r .runId "$private/replay.json")" = "$run_id"
   jq '. + {terminalReplaySameRun:true}' "$evidence/rejoin.json" > "$private/rejoin-safe.json"
   cp "$private/rejoin-safe.json" "$evidence/rejoin.json"
 else
-  jq -e '(.status == "cancelled" or .status == "failed") and (.scopedReview.scopes | length == 1)' "$private/poll.json" >/dev/null
+  jq -e '(.status == "cancelled" or .status == "failed") and (.scopedReview.scopes | length == 1) and all(.scopedReview.scopes[]; .publicationStatus=="confirmed" and .publishedConclusion=="neutral") and (.scopedReview.parentSummary | .publicationStatus=="confirmed" and .publishedConclusion=="neutral")' "$private/poll.json" >/dev/null
 fi
 printf 'PASS: %s run %s\n' "$scenario" "$run_id"
