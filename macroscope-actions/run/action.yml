@@ -1,0 +1,78 @@
+name: Macroscope Run
+description: Run a Macroscope review and expose its result.
+inputs:
+  api-url:
+    description: Macroscope HTTPS API base URL.
+    required: false
+    default: https://actions.macroscope.com
+  repository:
+    description: GitHub repository in owner/name form.
+    required: true
+  review:
+    description: "Review kind: cra or approvability."
+    required: false
+    default: cra
+  agent:
+    description: Agent title under .macroscope/check-run-agents/github-actions/. Required for CRA; omit for Approvability.
+    required: false
+  scopes:
+    description: JSON array of one or two parent-owned scopes. Requires the repository-scoped Approvability pilot.
+    required: false
+  commit:
+    description: Target commit SHA. Defaults to the event PR head for Approvability, or github.sha for CRA. Required for Approvability outside PR events.
+    required: false
+  base:
+    description: Base commit SHA. Required for Approvability and diff-shaped agents.
+    required: false
+  pull-request:
+    description: Pull request number. Required for Approvability and PR metadata agents.
+    required: false
+  fail-on:
+    description: "Step failure policy: failure, neutral, or never."
+    required: false
+    default: failure
+  timeout:
+    description: Maximum seconds to wait for a terminal Macroscope result.
+    required: false
+    default: "1800"
+  additional-instructions:
+    description: Optional CRA-only instructions appended to the agent prompt. Not supported for Approvability.
+    required: false
+outputs:
+  run-id:
+    description: Durable Macroscope run ID.
+    value: ${{ steps.run.outputs.run-id }}
+  verdict:
+    description: Terminal agent verdict.
+    value: ${{ steps.run.outputs.verdict }}
+  summary:
+    description: Terminal agent summary.
+    value: ${{ steps.run.outputs.summary }}
+runs:
+  using: composite
+  steps:
+    - id: run
+      shell: bash
+      env:
+        IN_API_URL: ${{ inputs.api-url }}
+        IN_REPOSITORY: ${{ inputs.repository }}
+        IN_REVIEW: ${{ inputs.review }}
+        IN_AGENT: ${{ inputs.agent }}
+        IN_SCOPES: ${{ inputs.scopes }}
+        IN_COMMIT: ${{ inputs.commit }}
+        IN_PR_HEAD_COMMIT: ${{ github.event.pull_request.head.sha }}
+        IN_BASE: ${{ inputs.base }}
+        IN_PULL_REQUEST: ${{ inputs.pull-request }}
+        IN_FAIL_ON: ${{ inputs.fail-on }}
+        IN_TIMEOUT: ${{ inputs.timeout }}
+        IN_ADDITIONAL_INSTRUCTIONS: ${{ inputs.additional-instructions }}
+        IN_POLL_INTERVAL: "5"
+        IN_ACTION_VERSION: v1
+      run: ${{ github.action_path }}/run.sh
+    - name: Upload Macroscope result
+      if: ${{ always() && steps.run.outputs.result-path != '' }}
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      with:
+        name: ${{ steps.run.outputs.result-artifact-name }}
+        path: ${{ steps.run.outputs.result-path }}
+        if-no-files-found: error

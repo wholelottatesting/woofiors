@@ -1,22 +1,11 @@
-name: Third Party CI
-
+name: Fixture prerequisite
 on:
   pull_request:
-
+permissions:
+  contents: read
 jobs:
   correctness-prerequisite:
-    name: correctness-prerequisite
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Read smoke-test gate
-        run: grep -qx pass .correctness-prerequisite
-
-  tp-pass:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "deliberately succeeds"; exit 0
-  tp-fail:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "deliberately fails"; exit 1
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: grep -qx pass .correctness-prerequisite

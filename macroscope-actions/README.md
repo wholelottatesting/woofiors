@@ -1,0 +1,325 @@
+# macroscope-actions
+
+## Scoped Approvability pilot
+
+Explicitly enabled repositories may pass `scopes` as a JSON array with one or two entries: `name`, `checkName`, `files` (1–1024 exact changed paths per scope), and `analysis: parent`. Names are 1–128 byte ASCII identifiers (letters, digits, `.`, `_`, `/`, `-`, starting with a letter or digit); check labels allow the same characters plus spaces, up to 255 bytes so they also fit GitHub output titles. Names and check labels are preserved exactly, without shortening or adding a prefix. Paths are capped at 256 bytes. Caller instructions and `responsible.users`/`responsible.teams` are unsupported in this pilot. Display check labels are not sent to the model. Use `review: approvability` with pinned `commit`, `base` and `pull-request`; omit `agent`. This is checks-only, never PR approval. Scoped artifacts use schemaVersion 2, including each immutable result and publication status/check identity; ordinary artifacts remain v1. See [deployment and smoke requirements](../docs/finished/approvability/scoped-parent-pilot.md).
+
+For example, these identifiers are accepted unchanged:
+
+```json
+{
+  "name": "trust-intelligence-behavioral-detection-small-medium-tests",
+  "checkName": "Macroscope - Approvability Check - trust-intelligence-behavioral-detection-small-medium-tests"
+}
+```
+
+Composite GitHub Actions for [Macroscope](https://macroscope.com) — run
+Macroscope reviews from workflows you own.
+
+**The model: your workflow owns the run.** Triggers, sequencing, retries,
+concurrency, cancellation, and the conclusion are all yours, in GitHub's
+native vocabulary — `on:`, `needs:`, `if:`, `strategy.matrix`,
+`concurrency:`. Macroscope is the execution backend: the `run` action starts
+a configured agent (defined as markdown under
+`.macroscope/check-run-agents/github-actions/` in your repo) or native Approvability,
+holds the invocation open, and reports its run ID, verdict, and summary as step outputs.
+For configured agents, the workflow job is the check; branch protection reads
+your job's conclusion directly. Approvability additionally publishes its native
+Macroscope check and may approve under ordinary repository policy. Supported triggers
+include `pull_request`, `push`, `schedule`, `release`, and `workflow_dispatch`,
+subject to the repository trust policy described below.
+
+Macroscope rejects `workflow_run` because the triggering workflow's provenance
+is not authenticated; run the agent in the source workflow instead, using
+`needs:` to sequence it after other jobs. It also rejects `pull_request_target`
+because it may execute untrusted code with base-repository authority; use
+`pull_request` instead.
+
+The `run` action is the supported workflow entry point for a configured agent
+(`review: cra`, the default) or ordinary Approvability (`review: approvability`). It mints GitHub OIDC,
+starts or rejoins one durable Macroscope run, polls until the server returns a
+terminal result, and writes the result as step outputs, a job summary, and a
+downloadable JSON result artifact.
+
+## Governance
+
+> **Canonical source: [`prassoai/back`](https://github.com/prassoai/back).**
+> This repository is a generated artifact of that monorepo's release
+> workflow, so the actions, the API they call, and their tests change
+> together. It accepts no contributions — pull requests are closed by policy,
+> and support and source live in the monorepo.
+
+Repository access restrictions, branch and tag protection, and feature
+availability are managed in GitHub repository settings, not enforced by this
+source tree. Do not assume those protections are configured; verify the
+repository settings directly.
+
+## Authentication
+
+The `run` action authenticates with a per-job **GitHub OIDC token** — there is
+no Macroscope API key or secret to store, rotate, or leak. The job grants
+`id-token: write`; the action mints the token and Macroscope verifies its
+claims against a repo-level trust policy. GitHub Actions agent runs default
+to enabled for existing and new repository settings; a repo admin can disable
+the integration in Macroscope settings.
+
+```yaml
+permissions:
+  contents: read
+  id-token: write       # REQUIRED: mints the OIDC token that authenticates to Macroscope
+  # no checks: scope — GitHub concludes the job; Macroscope owns its native checks
+```
+
+A `permissions:` map is **closed** — every scope it does not list is revoked —
+so `id-token: write` must be present. Without it the action fails immediately,
+naming the missing scope.
+
+## Usage
+
+### Ordinary Approvability
+
+Select Approvability without an `agent`, and pass the PR number and its base SHA.
+`commit` defaults to `github.event.pull_request.head.sha`, not the synthetic merge
+commit in `github.sha`. Outside PR events, pass the current PR head SHA explicitly.
+Explicit `commit` values always take precedence. CRA reviews retain their
+`github.sha` default. The example pins the head explicitly for clarity.
+The server verifies the current open PR and runs native
+Approvability, including repository exclusions, deterministic gates, configured
+approval behavior, Preview Mode and ordinary pricing. It creates a GitHub check
+using the installed Macroscope app; the job needs no `checks: write` permission.
+
+```yaml
+name: Macroscope Approvability
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  approvability:
+    runs-on: ubuntu-latest
+    steps:
+      - id: macroscope
+        uses: prassoai/macroscope-actions/run@<sha> # v1
+        with:
+          repository: ${{ github.repository }}
+          review: approvability
+          commit: ${{ github.event.pull_request.head.sha }}
+          base: ${{ github.event.pull_request.base.sha }}
+          pull-request: ${{ github.event.pull_request.number }}
+```
+
+Actions selects when the standard Approvability assessment runs, not its approval
+policy. Configure that policy in `.macroscope/approvability.md`. Approvability does
+not support `additional-instructions`; nonempty values are rejected. CRA reviews
+continue to support invocation instructions. Approvability verdict caching and
+thread reconciliation follow the ordinary repository-policy rules.
+
+The run may approve the PR under ordinary Approvability policy. Preview and
+policy skips finish neutrally; a denied review may finish with `failure` according
+to the repository's conclusion policy. `fail-on` controls the workflow step's exit
+status, not whether Macroscope may approve. Admission validates the requested PR
+and commits. After admission, PR freshness follows ordinary Approvability's
+webhook-derived state and targeted fallbacks, including its eventual-consistency
+windows. Internal invocation authority is separate: an expired polling lease or
+revoked invocation prevents new approvals. Stopping the GitHub job stops polling;
+authority can remain active until the lease expires. An approval validly posted
+before revocation remains in place; cancellation is not a rollback of an in-flight
+GitHub request.
+
+Scoped execution, child-analysis selection and runtime output schemas are not
+available through this interface; there is no `scopes-file` Action input yet.
+The HTTP API validates the scope request contract, but still rejects every scoped
+invocation before creating a run, including an empty array. Omit `scopes` for an
+ordinary review; `null` is invalid, not another spelling of omission.
+
+### Configured agents
+
+Full-diff agents pass an explicit `base`:
+
+```yaml
+name: Macroscope Release Audit
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  release-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - id: macroscope
+        uses: prassoai/macroscope-actions/run@<sha> # v1
+        with:
+          repository: ${{ github.repository }}
+          agent: Release Audit
+          commit: ${{ github.event.pull_request.head.sha }}
+          base: ${{ github.event.pull_request.base.sha }}
+          fail-on: failure
+          timeout: "1800"
+          additional-instructions: |
+            Focus on release-blocking regressions.
+```
+
+PR metadata agents pass `pull-request` instead:
+
+```yaml
+name: Macroscope PR Metadata
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  pr-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - id: macroscope
+        uses: prassoai/macroscope-actions/run@<sha> # v1
+        with:
+          repository: ${{ github.repository }}
+          agent: PR Metadata Audit
+          commit: ${{ github.event.pull_request.head.sha }}
+          pull-request: ${{ github.event.pull_request.number }}
+```
+
+## Inputs
+
+| Input | Required | Default | Description |
+| --- | --- | --- | --- |
+| `api-url` | no | `https://actions.macroscope.com` | HTTPS Macroscope control plane URL. |
+| `repository` | yes | | Repository in `owner/name` form; must match GitHub OIDC claims. |
+| `review` | no | `cra` | `cra` for a configured agent; `approvability` for native ordinary Approvability. |
+| `agent` | CRA only | | Agent title under `.macroscope/check-run-agents/github-actions/`. Omit for Approvability. |
+| `commit` | no | `${{ github.sha }}` | Target commit SHA. |
+| `base` | Approvability or diff input | | Explicit base commit SHA. |
+| `pull-request` | Approvability or PR metadata input | | Pull request number for PR metadata inputs and PR-scoped tools. |
+| `fail-on` | no | `failure` | `failure`, `neutral`, or `never`. |
+| `timeout` | no | `1800` | Maximum seconds to wait for a terminal result. |
+| `additional-instructions` | CRA only | | Extra prompt text, capped at 16 KiB (bytes). Approvability rejects nonempty instructions. |
+
+### HTTP selection
+
+The same OIDC-authenticated `POST /api/v1/github-actions/agent-runs` endpoint
+accepts the following ordinary Approvability body:
+
+```json
+{
+  "repository": "acme/widget",
+  "review": {"kind": "approvability"},
+  "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "base": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "pullRequest": 42,
+  "idempotencyDiscriminator": "approvability-step"
+}
+```
+
+The response remains `202` with `runId` and `jobToken`; poll with that job token
+using the existing lease-renewing endpoint. Admission is not a verdict: PR identity
+and commits are validated once, then ordinary native PR state and review policy
+govern execution. Existing HTTP requests with `agent` and no `review` remain CRA
+requests; explicit
+`{"kind":"cra"}` also requires `agent`. Approvability rejects a nonempty `agent`.
+Reusing one invocation key for another review kind returns `409`; use a different
+discriminator for a separate review. Pending Approvability retries retain the
+original durable target; running retries reuse the same execution and polling
+scope. Polling fields and version-1 result artifacts remain unchanged.
+
+## Outputs
+
+| Output | Description |
+| --- | --- |
+| `run-id` | Durable Macroscope run ID. Written once start succeeds. |
+| `verdict` | Terminal verdict: `success`, `neutral`, or `failure`. |
+| `summary` | Terminal agent summary. |
+
+## Job summary and result artifact
+
+Every valid terminal result appends a Macroscope section to
+`$GITHUB_STEP_SUMMARY`: agent verdict, run status, run ID, summary, and a
+reason when provided, plus Agent Credits or **Not billed**. Existing
+summary content is preserved. Agent text is
+HTML-escaped and displayed as preformatted
+text, not interpreted as HTML or Markdown.
+
+The action uploads `result.json` in an artifact named
+`macroscope-result-<run-id>-<unique-suffix>`. The durable Macroscope run ID
+provides correlation; a per-invocation suffix prevents collisions when a run
+is rejoined. Download it from the workflow run's **Artifacts** section.
+Retention follows the repository's artifact retention policy.
+
+The version 1 JSON contract is:
+
+```json
+{
+  "schemaVersion": 1,
+  "runId": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "succeeded",
+  "reason": null,
+  "verdict": "success",
+  "summary": "Clean\nship it",
+  "agentCredits": "3.579"
+}
+```
+
+`status` is `succeeded`, `failed`, or `cancelled`; absent `reason`, `verdict`,
+and `summary` are represented as JSON `null`. Consumers should check
+`schemaVersion` before reading the result. `agentCredits` is an exact decimal
+string. Runs with no credits charged display **Not billed** in the job summary;
+the artifact records zero credits.
+
+This is a **terminal result artifact, not a canonical structured findings
+list**. It contains only the documented fields, never internal
+`findingsReference` values, arbitrary API fields, or authentication tokens.
+It retains the original summary text in JSON without rendering it. Anyone
+with access to the workflow summary or artifact can read the agent's result;
+apply the same care to prompts and summaries as to workflow logs.
+
+## Runtime behavior
+
+Polling is the execution lease. While the backend reports `pending` or
+`running`, each poll renews the lease; if the workflow is cancelled or the
+runner dies, polling stops and Macroscope lapses the run server-side. The
+action retries transport failures, server errors, `429`, and rate-limited
+`403` responses within the remaining timeout budget.
+
+`fail-on` maps the terminal result to the step exit status. `failure` fails
+only on a failed or absent verdict, `neutral` also fails on neutral, and
+`never` leaves the step green for agent outcomes and timeouts. Terminal outputs
+and the job summary are written before any fail-on failure. The artifact upload
+uses `always()` when a result file exists, so a failing verdict does not skip
+it or turn the failed action green. `if: always()` consumers can still inspect
+the existing outputs. Upload errors fail the action independently of `fail-on`.
+Timeouts, transport failures, and malformed responses do not fabricate a
+terminal summary or artifact; `run-id` remains available if start succeeded.
+Hard cancellation or runner loss can prevent publication or upload.
+
+## Versioning / pinning
+
+**Pin to a full commit SHA** — `uses: prassoai/macroscope-actions/run@<sha>` —
+with a trailing `# v1.x.y` comment for readability. A mutable tag (`@v1`,
+`@main`) lets a retagged upstream run attacker-controlled code inside a job
+that can mint an OIDC token; an immutable SHA cannot move under you.
+
+There is no container image in these actions. The run script uses `curl`,
+`jq`, and `openssl` (for random output delimiters). Result upload delegates
+to a full-SHA-pinned `actions/upload-artifact` v6, which uses Node.js 24;
+self-hosted runners require Actions Runner 2.327.1 or newer and access to
+GitHub's artifact service. This uploader does not support GitHub Enterprise
+Server (GHES).
+No additional `GITHUB_TOKEN` permission is needed for the upload.
+
+## License
+
+MIT

@@ -1,0 +1,42 @@
+name: Deployed staging mixed-risk acceptance
+on:
+  pull_request:
+    branches: [smoke/mixed-risk-17606-20261102-base]
+    types: [opened, synchronize]
+permissions:
+  contents: read
+jobs:
+  mixed-risk:
+    if: github.repository == 'wholelottatesting/woofiors' && github.event.pull_request.head.ref == 'smoke/mixed-risk-17606-20261102-head'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      checks: read
+      pull-requests: read
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SMOKE_HEAD: ${{ github.event.pull_request.head.sha }}
+      SMOKE_BASE: ${{ github.event.pull_request.base.sha }}
+      SMOKE_PR: ${{ github.event.pull_request.number }}
+      SMOKE_API: https://primary.lb.webhook.staging.back.nonprod.prasso.ai
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Await clean correctness and settled native review
+        run: bash .github/scripts/mixed-risk-staging.sh prerequisite
+      - name: Run one parent-owned scoped review
+        run: bash .github/scripts/mixed-risk-staging.sh scoped
+      - name: Capture published checks and rendered summary
+        if: always()
+        run: bash .github/scripts/mixed-risk-staging.sh collect
+      - name: Upload sanitized acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: deployed-staging-mixed-risk
+          path: ${{ runner.temp }}/mixed-risk-evidence/
+          if-no-files-found: error
+          retention-days: 7
