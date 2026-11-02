@@ -2,7 +2,7 @@ name: Scoped bounded follow-up 17606
 
 on:
   pull_request:
-    branches: [smoke/bounded-v5-17606-20261102-base]
+    branches: [smoke/bounded-v6-17606-20261102-base]
     types: [opened, synchronize]
 
 permissions:
@@ -14,8 +14,8 @@ jobs:
       github.repository == 'wholelottatesting/woofiors' &&
       github.event.pull_request.commits == 1 &&
       github.event.pull_request.head.repo.full_name == 'wholelottatesting/woofiors' &&
-      github.event.pull_request.head.ref == 'smoke/bounded-v5-17606-20261102-head'
-    runs-on: scoped-bounded-v5-17606-20261102
+      github.event.pull_request.head.ref == 'smoke/bounded-v6-17606-20261102-head'
+    runs-on: scoped-bounded-v6-17606-20261102
     timeout-minutes: 40
     permissions:
       contents: read
@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           source=/home/murmur/workspace/back
-          test "$(git -C "$source" rev-parse HEAD)" = 4413f8f1670b56588e07fd5754f1104d9f6b7d78
+          test "$(git -C "$source" rev-parse HEAD)" = 0d67a20fa5f9f8fd65294c0bbcbf88c9a08c57f4
           git -C "$source" diff --exit-code HEAD -- macroscope-actions
           ln -s "$source/macroscope-actions" .local-macroscope-actions
           curl --silent --show-error --fail https://127.0.0.1:18443/ready
