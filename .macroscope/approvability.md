@@ -2,6 +2,7 @@
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"
+preview: true
 alwaysApprove:
   - "always-approve-smoke/**"
 ---
