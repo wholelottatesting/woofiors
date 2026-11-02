@@ -56,6 +56,7 @@ emit_terminal_outputs "$private/poll.json" "$run_id"
 if [[ "$scenario" == success ]]; then
   jq -e '.status == "succeeded" and .verdict == "success" and (.scopedReview.scopes | length == 1) and (.scopedReview.scopes[0] | .conclusion == "success" and .publicationStatus == "confirmed" and .publishedConclusion == "success")' "$private/poll.json" >/dev/null
   jq -e '.scopedReview.parentSummary.checkName=="Macroscope - Approvability Check (Scopes)" and (.summary|contains("Invoked via GitHub Actions."))' "$private/poll.json" >/dev/null
+  oidc=$(mint_oidc_token "$private/replay-oidc.json" "$private/replay-oidc.headers" "$private/replay-oidc.config" "$deadline")
   start_run "$oidc" "$payload" "$private/replay.json" "$private/replay.headers" "$private/replay.config" "$deadline"
   test "$(jq -r .runId "$private/replay.json")" = "$run_id"
   jq '. + {terminalReplaySameRun:true}' "$evidence/rejoin.json" > "$private/rejoin-safe.json"
