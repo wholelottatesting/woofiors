@@ -1,4 +1,5 @@
 ---
+mode: strict
 onlyApprove:
   - "only-approve-smoke/**"
   - "always-approve-smoke/**"

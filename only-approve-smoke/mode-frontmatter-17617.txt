@@ -1,0 +1,2 @@
+Approvability mode front matter smoke fixture.
+Status: baseline.
