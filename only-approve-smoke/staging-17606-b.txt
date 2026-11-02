@@ -1,2 +1,2 @@
 status: ready
-revision: deployed-staging-base
+revision: deployed-staging-head
