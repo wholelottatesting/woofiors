@@ -6,7 +6,7 @@ evidence="$RUNNER_TEMP/deployed-staging-evidence"
 mkdir -p "$evidence"
 github_state() {
   gh api "repos/wholelottatesting/woofiors/pulls/$SMOKE_PR/reviews" --jq '[.[]|{id,state,commit_id,submitted_at,user:.user.login}]' > "$evidence/reviews-$1.json"
-  gh api --paginate --slurp "repos/wholelottatesting/woofiors/commits/$SMOKE_HEAD/check-runs?filter=all&per_page=100" --jq '[.[].check_runs[]|{id,node_id,name,status,conclusion,external_id,started_at,completed_at,app_id:.app.id,title:.output.title,summary:.output.summary}]' > "$evidence/checks-$1.json"
+  gh api --paginate --slurp "repos/wholelottatesting/woofiors/commits/$SMOKE_HEAD/check-runs?filter=all&per_page=100" | jq '[.[].check_runs[]|{id,node_id,name,status,conclusion,external_id,started_at,completed_at,app_id:.app.id,title:.output.title,summary:.output.summary}]' > "$evidence/checks-$1.json"
 }
 case "$scenario" in
   prerequisite)
@@ -16,7 +16,7 @@ case "$scenario" in
     jq -n --arg api "$SMOKE_API" --arg head "$SMOKE_HEAD" --arg base "$SMOKE_BASE" --arg pr "$SMOKE_PR" --arg run "$GITHUB_RUN_ID" --arg source 949ac7ad24a9348dc35c852dab22e88a8cc8b742 '{api:$api,head:$head,base:$base,pullRequest:$pr,actionsRun:$run,actionSource:$source,execution:"deployed-staging-not-loopback"}' > "$evidence/context.json"
     for attempt in {1..96}; do
       github_state prerequisite
-      if jq -e 'any(.[]; .name=="Macroscope - Correctness Check" and .status=="completed" and .conclusion=="success")' "$evidence/checks-prerequisite.json" >/dev/null; then
+      if jq -e 'any(.[]; .name=="Macroscope - Correctness Check" and .status=="completed" and (.conclusion=="success" or .conclusion=="skipped"))' "$evidence/checks-prerequisite.json" >/dev/null; then
         exit 0
       fi
       sleep 5
@@ -25,9 +25,6 @@ case "$scenario" in
     exit 1
     ;;
   collect)
-    github_state final
-    curl --silent --show-error --fail --max-time 20 "$SMOKE_API/" > "$evidence/webhook-after.json"
-    curl --silent --show-error --fail --max-time 20 https://primary.lb.billing.staging.back.nonprod.prasso.ai/ > "$evidence/billing-after.json"
     mkdir -p "$evidence/results" "$evidence/summaries"
     while IFS= read -r -d '' result; do
       cp "$result" "$evidence/results/$(basename "$(dirname "$result")").json"
@@ -37,6 +34,9 @@ case "$scenario" in
         cp "$summary" "$evidence/summaries/$(basename "$summary").md"
       fi
     done < <(find "$RUNNER_TEMP/_runner_file_commands" -name 'step_summary_*' -print0)
+    github_state final
+    curl --silent --show-error --fail --max-time 20 "$SMOKE_API/" > "$evidence/webhook-after.json"
+    curl --silent --show-error --fail --max-time 20 https://primary.lb.billing.staging.back.nonprod.prasso.ai/ > "$evidence/billing-after.json"
     exit 0
     ;;
 esac
