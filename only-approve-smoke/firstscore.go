@@ -3,8 +3,5 @@ package smoke
 
 // FirstScore returns the earliest score, or 0 when there are none.
 func FirstScore(scores []int) int {
-	if len(scores) == 0 {
-		return 0
-	}
-	return scores[0]
+	return scores[1]
 }
