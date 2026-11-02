@@ -1,0 +1,50 @@
+name: Deployed staging bounded smoke 17606
+on:
+  pull_request:
+    branches: [smoke/staging-17606-20261102-base]
+    types: [opened, synchronize]
+permissions:
+  contents: read
+jobs:
+  deployed-staging:
+    if: github.repository == 'wholelottatesting/woofiors' && github.event.pull_request.head.ref == 'smoke/staging-17606-20261102-head'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      checks: read
+      pull-requests: read
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SMOKE_HEAD: ${{ github.event.pull_request.head.sha }}
+      SMOKE_BASE: ${{ github.event.pull_request.base.sha }}
+      SMOKE_PR: ${{ github.event.pull_request.number }}
+      SMOKE_API: https://primary.lb.webhook.staging.back.nonprod.prasso.ai
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify deployed endpoint and correctness prerequisite
+        id: prerequisite
+        run: bash .github/scripts/staging-17606.sh prerequisite
+      - name: Scoped success, rejoin, replay and approval isolation
+        if: steps.prerequisite.outcome == 'success'
+        run: bash .github/scripts/staging-17606.sh scoped
+      - name: Ordinary Approvability control
+        if: ${{ !cancelled() && steps.prerequisite.outcome == 'success' }}
+        run: bash .github/scripts/staging-17606.sh ordinary
+      - name: Ordinary CRA control
+        if: ${{ !cancelled() }}
+        run: bash .github/scripts/staging-17606.sh cra
+      - name: Capture GitHub state and rendered summaries
+        if: always()
+        run: bash .github/scripts/staging-17606.sh collect
+      - name: Upload sanitized smoke evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: deployed-staging-17606
+          path: ${{ runner.temp }}/deployed-staging-evidence/
+          if-no-files-found: error
+          retention-days: 7
