@@ -1,2 +1,2 @@
 status: ready
-revision: bounded-control-reviewed-v6
+revision: bounded-control-freshness-v6
