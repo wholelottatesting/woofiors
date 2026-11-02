@@ -18,7 +18,7 @@ IN_TIMEOUT=900
 IN_POLL_INTERVAL=5
 IN_ACTION_VERSION=v1
 IN_FAIL_ON=never
-IN_SCOPES=$(jq -nc --arg scenario "$scenario" '[{name:"Ready",checkName:("Bounded 17606 " + $scenario + " Ready"),analysis:"parent",files:["smoke/scoped-followup-17606/ready.txt"]}]')
+IN_SCOPES=$(jq -nc --arg scenario "$scenario" '[{name:"Ready",checkName:("Bounded 17606 " + $scenario + " Ready"),analysis:"parent",files:["only-approve-smoke/17606-ready.txt"]}]')
 validate_run_inputs
 deadline=$((SECONDS + IN_TIMEOUT))
 oidc=$(mint_oidc_token "$private/oidc.json" "$private/oidc.headers" "$private/oidc.config" "$deadline")

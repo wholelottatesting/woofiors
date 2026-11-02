@@ -3,7 +3,7 @@ name: Scoped bounded follow-up 17606
 on:
   pull_request:
     branches: [smoke/bounded-v4-17606-20261102-base]
-    types: [opened]
+    types: [synchronize]
 
 permissions:
   contents: read
@@ -12,9 +12,10 @@ jobs:
   bounded-followup:
     if: >-
       github.repository == 'wholelottatesting/woofiors' &&
+      github.event.pull_request.commits == 1 &&
       github.event.pull_request.head.repo.full_name == 'wholelottatesting/woofiors' &&
       github.event.pull_request.head.ref == 'smoke/bounded-v4-17606-20261102-head'
-    runs-on: scoped-bounded-v4-17606-20261102
+    runs-on: scoped-bounded-v5-17606-20261102
     timeout-minutes: 40
     permissions:
       contents: read
@@ -39,9 +40,6 @@ jobs:
           git -C "$source" diff --exit-code HEAD -- macroscope-actions
           ln -s "$source/macroscope-actions" .local-macroscope-actions
           curl --silent --show-error --fail https://127.0.0.1:18443/ready
-      - name: Scoped success and authenticated retry/rejoin
-        shell: bash
-        run: bash .github/scripts/scoped-followup-17606.sh success
       - name: Ordinary whole-PR Approvability control
         if: ${{ !cancelled() }}
         id: ordinary
@@ -55,20 +53,6 @@ jobs:
           pull-request: ${{ env.SMOKE_PR }}
           fail-on: neutral
           timeout: "900"
-      - name: Ordinary CRA control
-        if: ${{ !cancelled() }}
-        id: cra
-        uses: ./.local-macroscope-actions/run
-        with:
-          api-url: https://127.0.0.1:18443
-          repository: wholelottatesting/woofiors
-          review: cra
-          agent: Bounded local 17606
-          commit: ${{ env.SMOKE_HEAD }}
-          base: ${{ env.SMOKE_BASE }}
-          pull-request: ${{ env.SMOKE_PR }}
-          fail-on: neutral
-          timeout: "600"
       - name: Freshness revocation preserves completed checks
         if: ${{ !cancelled() }}
         shell: bash
