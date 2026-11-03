@@ -1,0 +1,2 @@
+Disposable deployed-staging smoke: ordinary Actions Approvability without scopes.
+No application behavior changes. Do not merge this fixture.
