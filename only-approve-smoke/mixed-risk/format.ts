@@ -1,4 +1,4 @@
-// Formats a price for display in US dolars.
+// Formats a price for display in US dollars.
 export function formatUsd(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }

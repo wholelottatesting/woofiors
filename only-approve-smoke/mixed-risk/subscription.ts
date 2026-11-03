@@ -1,3 +1,3 @@
 export function monthlySubscriptionPriceCents(): number {
-  return 4900;
+  return 24900;
 }
