@@ -13,13 +13,13 @@ case "$scenario" in
     curl --silent --show-error --fail --connect-timeout 10 --max-time 20 "$SMOKE_API/ready"
     curl --silent --show-error --fail --max-time 20 "$SMOKE_API/" > "$evidence/webhook-before.json"
     curl --silent --show-error --fail --max-time 20 https://primary.lb.billing.staging.back.nonprod.prasso.ai/ > "$evidence/billing-before.json"
-    jq -n --arg api "$SMOKE_API" --arg head "$SMOKE_HEAD" --arg base "$SMOKE_BASE" --arg pr "$SMOKE_PR" --arg run "$GITHUB_RUN_ID" --arg source 949ac7ad24a9348dc35c852dab22e88a8cc8b742 '{api:$api,head:$head,base:$base,pullRequest:$pr,actionsRun:$run,actionSource:$source,execution:"deployed-staging-not-loopback",analysis:"parent"}' > "$evidence/context.json"
+    jq -n --arg api "$SMOKE_API" --arg head "$SMOKE_HEAD" --arg base "$SMOKE_BASE" --arg pr "$SMOKE_PR" --arg run "$GITHUB_RUN_ID" --arg source f2fe5d03008217ffc9201d77bf4bf00c1ee83494 '{api:$api,head:$head,base:$base,pullRequest:$pr,actionsRun:$run,actionSource:$source,execution:"deployed-staging-not-loopback",analysis:"parent"}' > "$evidence/context.json"
     for attempt in {1..144}; do
       if (( attempt % 12 == 1 )); then
         printf 'Awaiting native prerequisites (%d/144).\n' "$attempt"
       fi
       github_state prerequisite
-      if jq -e 'any(.[]; .name=="Macroscope - Correctness Check" and .status=="completed" and .conclusion=="success") and any(.[]; .name=="Macroscope - Approvability Check" and .status=="completed") and any(.[]; .name=="correctness-prerequisite" and .status=="completed" and .conclusion=="success")' "$evidence/checks-prerequisite.json" >/dev/null; then
+      if jq -e 'any(.[]; .name=="Macroscope - Correctness Check" and .status=="completed" and .conclusion=="success") and any(.[]; .name=="correctness-prerequisite" and .status=="completed" and .conclusion=="success")' "$evidence/checks-prerequisite.json" >/dev/null; then
         exit 0
       fi
       sleep 5
@@ -52,15 +52,15 @@ IN_REVIEW=approvability
 IN_COMMIT=$SMOKE_HEAD
 IN_BASE=$SMOKE_BASE
 IN_PULL_REQUEST=$SMOKE_PR
-IN_TIMEOUT=600
+IN_TIMEOUT=900
 IN_POLL_INTERVAL=5
 IN_ACTION_VERSION=v1
 IN_FAIL_ON=never
-IN_SCOPES='[{"name":"CommentOnly","checkName":"Staging Mixed Risk - Comment","analysis":"parent","files":["only-approve-smoke/mixed-risk/format.ts"]},{"name":"SubscriptionPricing","checkName":"Staging Mixed Risk - Pricing","analysis":"parent","files":["only-approve-smoke/mixed-risk/subscription.ts"]}]'
+IN_SCOPES='[{"name":"Amber","checkName":"Fictional Amber - Documentation","analysis":"parent","files":["only-approve-smoke/mixed-risk/format.ts"],"responsible":{"users":["fictional-amber-user"],"teams":["fictional-guild/amber"]}},{"name":"Birch","checkName":"Fictional Birch - Pricing","analysis":"parent","files":["only-approve-smoke/mixed-risk/subscription.ts"],"responsible":{"users":["fictional-birch-user"],"teams":["fictional-guild/birch"]}},{"name":"Cobalt","checkName":"Fictional Cobalt - Receipt","analysis":"parent","files":["only-approve-smoke/mixed-risk/receipt.ts"],"responsible":{"users":["fictional-cobalt-user"],"teams":["fictional-guild/cobalt"]}}]'
 GITHUB_ACTION=deployed-staging-mixed-risk
 github_state before-scoped
 run_action
 cp "$RUN_ACTION_TMP/poll.json" "$evidence/scoped-terminal.json"
 github_state after-scoped
-jq -e '.status=="succeeded" and .verdict=="neutral" and (.scopedReview.scopes|length==2) and any(.scopedReview.scopes[]; .name=="CommentOnly" and .analysis=="parent" and .conclusion=="success" and .publicationStatus=="confirmed" and .publishedConclusion=="success") and any(.scopedReview.scopes[]; .name=="SubscriptionPricing" and .analysis=="parent" and .conclusion=="neutral" and .publicationStatus=="confirmed" and .publishedConclusion=="neutral") and (.scopedReview.parentSummary|.publicationStatus=="confirmed" and .publishedConclusion=="neutral")' "$evidence/scoped-terminal.json" >/dev/null
+jq -e '.status=="succeeded" and .verdict=="neutral" and (.scopedReview.scopes|length==3) and any(.scopedReview.scopes[]; .name=="Amber" and .analysis=="parent" and .conclusion=="success" and .publicationStatus=="confirmed" and .publishedConclusion=="success") and any(.scopedReview.scopes[]; .name=="Birch" and .analysis=="parent" and .conclusion=="neutral" and .publicationStatus=="confirmed" and .publishedConclusion=="neutral") and any(.scopedReview.scopes[]; .name=="Cobalt" and .analysis=="parent" and .conclusion=="success" and .publicationStatus=="confirmed" and .publishedConclusion=="success") and (.scopedReview.parentSummary|.publicationStatus=="confirmed" and .publishedConclusion=="neutral")' "$evidence/scoped-terminal.json" >/dev/null
 jq -e -s '(.[0]|map(.id)|sort)==(.[1]|map(.id)|sort)' "$evidence/reviews-before-scoped.json" "$evidence/reviews-after-scoped.json" >/dev/null

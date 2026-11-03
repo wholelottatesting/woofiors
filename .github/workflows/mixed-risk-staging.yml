@@ -1,13 +1,13 @@
-name: Deployed staging mixed-risk acceptance
+name: Deployed staging three-scope acceptance
 on:
   pull_request:
-    branches: [smoke/mixed-risk-17606-20261102-base]
+    branches: [smoke/scopes-three-20261103-base]
     types: [opened, synchronize]
 permissions:
   contents: read
 jobs:
   mixed-risk:
-    if: github.repository == 'wholelottatesting/woofiors' && github.event.pull_request.head.ref == 'smoke/mixed-risk-17606-20261102-head'
+    if: github.repository == 'wholelottatesting/woofiors' && github.event.pull_request.head.ref == 'smoke/scopes-three-20261103-head'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -36,7 +36,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: deployed-staging-mixed-risk
+          name: deployed-staging-three-scopes
           path: ${{ runner.temp }}/mixed-risk-evidence/
           if-no-files-found: error
           retention-days: 7
