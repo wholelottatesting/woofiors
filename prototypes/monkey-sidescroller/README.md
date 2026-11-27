@@ -43,12 +43,26 @@ randomly:
 
 ## Characters
 
-Unlocked by finishing levels; your pick persists in `localStorage`.
+The roster appears before every level once more than one character is
+unlocked — including after a game over. Your pick and your unlocks persist in
+`localStorage`.
 
 | Character | Unlocked by |
 |---|---|
 | **Mono** — the grey stuffed monkey | default |
-| **Arthur** — five years old | beating level 1 |
+| **Arthur** — five years old, dark blonde hair, red shoes | beating level 1 |
+| **Mommy** — dark curly hair, witch hat and robe | beating level 2 |
+| **Daddy** — tall, short black hair, jersey, carrying a basketball | beating level 3 |
+| **Toby** — merle tri-colour bernedoodle | beating level 4 |
+
+All characters share one animation rig and one hitbox, so they play
+identically; a skin swaps colours and toggles features (muzzle, tail, curly
+hair, hat, basketball). Toby sets `quad: true` and takes a separate
+four-legged body plan that reuses the same animation parameters, so his run
+and jump timing match everyone else's.
+
+The roster grid reflows: one row in landscape, wrapping to multiple shorter
+rows in portrait as the cast grows.
 
 ## Level-generation invariants
 
