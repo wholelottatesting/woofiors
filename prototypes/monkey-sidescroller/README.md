@@ -36,9 +36,11 @@ jump under the right.
 | Hold right half | Run right (release to stop) |
 
 Hit zones are full-height screen slices, not the drawn buttons, so there is
-nothing to miss with a thumb. Sliding a thumb between the two movement zones
-hands over cleanly; sliding *into* the jump zone deliberately does not fire a
-jump.
+nothing to miss with a thumb. Each zone is marked by a large translucent
+arrow near the bottom of the screen, with faint full-height dividers showing
+where one zone ends and the next begins; the arrows brighten while held.
+Sliding a thumb between the two movement zones hands over cleanly; sliding
+*into* the jump zone deliberately does not fire a jump.
 
 On a ladder under `PAD`, right climbs forward, left climbs back, and letting
 go holds position. Under `TAP` there is no back button, so releasing
@@ -79,7 +81,7 @@ unlocked — including after a game over. Your pick and your unlocks persist in
 | **Mommy** — dark curly hair, fairy wings, tiara and star wand | beating level 2 |
 | **Daddy** — tall, short black hair, jersey, carrying a basketball | beating level 3 |
 | **Toby** — merle tri-colour bernedoodle | beating level 4 |
-| **Nana** — grandma in a lion costume, mane and glasses | beating level 5 |
+| **Nana** — grandma as Mary Poppins: boater, bun, umbrella | beating level 5 |
 | **Gammy** — grandma in a whale costume, hood, spout and fluke | beating level 6 |
 | **Zayde** — grandpa in a black bear costume, glasses and moustache | beating level 7 |
 | **Hellen** — five years old, brown bob and a bow | beating level 8 |
@@ -91,6 +93,7 @@ All characters share one animation rig and one hitbox, so they play
 identically. A skin swaps colours and toggles features — `muzzle`, `tail`,
 `curly` / `shortHair` / `longHair`, `hat`, `crown`, `wings`, `wand`, `ball`,
 `mane`, `hood`, `spout`, `fluke`, `animalEar`, `glasses`, `moustache`, `bow`,
+`boater`, `bun`, `bowtie`, `umbrella`,
 and `lift` for a taller build. Toby sets `quad: true` and takes a separate
 four-legged body plan that reuses the same animation parameters, so his run
 and jump timing match everyone else's.

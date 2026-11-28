@@ -718,17 +718,17 @@ const SKINS = {
     brow: '#2b2026', line: '#9a6a52'
   },
   nana: {
-    name: 'NANA', blurb: 'LION GRANDMA',
-    torso: '#d9a257', torsoShade: '#b07c35', belly: '#f0d7a8', bellyDark: '#c9ac78',
+    name: 'NANA', blurb: 'PRACTICALLY PERFECT',
+    torso: '#2f3a5c', torsoShade: '#222a44', belly: '#f2efe6', bellyDark: '#cfc9bc',
     head: '#f7d3b0', headHi: '#ffe6c8',
-    arm: '#d9a257', armBack: '#b07c35', hand: '#f0d7a8', handBack: '#c9ac78',
-    leg: '#d9a257', legBack: '#b07c35', foot: '#8a5f26', footBack: '#6b4719',
+    arm: '#2f3a5c', armBack: '#222a44', hand: '#f2efe6', handBack: '#cfc9bc',
+    leg: '#222a44', legBack: '#19203a', foot: '#1b1720', footBack: '#120f16',
     ear: 7.5, earOuter: '#f7d3b0', earInner: '#dcb08c',
-    muzzle: false, tail: '#d9a257', tailTuft: '#8a5f26', patch: false, hair: null,
-    mane: '#c8893f', maneDark: '#9a6424',
-    animalEar: '#c8893f', animalEarInner: '#f0d7a8',
-    glasses: '#4a4038',
-    brow: '#8a5f26', line: '#9a6a52'
+    muzzle: false, tail: null, patch: false,
+    hair: '#4a3328', hairHi: '#6b4b38', shortHair: true, bun: true,
+    boater: '#e8cf96', boaterBand: '#c8343f', bowtie: '#c8343f',
+    umbrella: '#1f2433', umbrellaHi: '#55617e',
+    brow: '#4a3328', line: '#9a6a52'
   },
   gammy: {
     name: 'GAMMY', blurb: 'WHALE GRANDMA',
@@ -972,6 +972,10 @@ function drawMonkey(cx, feetY, a, skinId) {
     armFx = 5;
     armFy = -9 + Math.sin(a.phase) * 1.2;
   }
+  if (S.umbrella) {
+    armFx = 5;
+    armFy = -5 + Math.sin(a.phase) * 1;
+  }
 
   const lift = S.lift || 0;             // taller characters sit higher on the same feet
   const bx = cx + tilt * face;          // body center x
@@ -1044,6 +1048,14 @@ function drawMonkey(cx, feetY, a, skinId) {
     rect(bx - 3, bodyY - 5, 7, 1, S.torsoShade);
     rect(bx - 4, bodyY + 5, 9, 1, S.torsoShade);
   }
+  if (S.bowtie) {  // high white collar with a red bow at the throat
+    rect(bx - 4, bodyY - 6, 9, 2, '#f2efe6');
+    ell(bx - 2, bodyY - 5, 2.2, 1.7, O);
+    ell(bx + 2, bodyY - 5, 2.2, 1.7, O);
+    ell(bx - 2, bodyY - 5, 1.5, 1.1, S.bowtie);
+    ell(bx + 2, bodyY - 5, 1.5, 1.1, S.bowtie);
+    rect(bx, bodyY - 6, 1, 3, '#9c2026');
+  }
   if (S.jersey) {  // sleeveless jersey: gold trim and a number
     rect(bx - 5, bodyY - 5, 11, 1, S.jersey);
     rect(bx - 5, bodyY + 5, 11, 1, S.jersey);
@@ -1080,6 +1092,13 @@ function drawMonkey(cx, feetY, a, skinId) {
       const mx = bx + Math.cos(ang) * 10.5, my = headY + Math.sin(ang) * 9.5;
       ell(mx, my, 3.5, 3.5, i % 2 ? S.mane : S.maneDark);
     }
+  }
+
+  // hair bun, tucked behind the head
+  if (S.bun) {
+    ell(bx - 8 * face, headY + 1, 3.8, 3.8, O);
+    ell(bx - 8 * face, headY + 1, 3, 3, S.hair);
+    ell(bx - 9 * face, headY, 1.3, 1.1, S.hairHi);
   }
 
   // rounded animal ears sit on top of the head (lion, bear)
@@ -1163,6 +1182,18 @@ function drawMonkey(cx, feetY, a, skinId) {
     rect(bx + 5, headY - 9, 1, 1, S.crown);
     rect(bx - 1, headY - 11, 3, 3, S.crown);
     rect(bx, headY - 10, 1, 1, S.crownGem);
+  }
+
+  if (S.boater) {  // straw boater with a ribbon band and a daisy
+    const hy = headY - 7;
+    ell(bx, hy, 12, 3.2, O);
+    ell(bx, hy, 11, 2.3, S.boater);
+    rect(bx - 7, hy - 6, 14, 6, O);
+    rect(bx - 6, hy - 5, 12, 5, S.boater);
+    rect(bx - 6, hy - 3, 12, 2, S.boaterBand);
+    rect(bx - 6, hy - 5, 12, 1, '#f5e6b8');
+    ell(bx + 5 * face, hy - 4, 2.2, 1.8, '#f7f2dc');
+    rect(bx + 5 * face, hy - 4, 1, 1, '#e8b43c');
   }
 
   if (S.hat) {     // witch hat: brim, leaning cone, band and buckle
@@ -1255,6 +1286,23 @@ function drawMonkey(cx, feetY, a, skinId) {
     rect(wtX + 4, wtY - 3 + sp, 1, 1, '#ffffff');
     rect(wtX - 5, wtY + 2 - sp, 1, 1, S.wandStar);
     rect(wtX + 2, wtY + 5 + sp, 1, 1, '#ffffff');
+  }
+
+  if (S.umbrella) {   // compact open umbrella held up over the shoulder
+    const ux = fhX + 4 * face, uy = fhY - 19;
+    limb(fhX, fhY + 2, ux, uy + 4, 3, O);
+    limb(fhX, fhY + 2, ux, uy + 4, 1, '#7a6450');
+    ell(ux, uy + 1, 7.6, 4.6, O);
+    ell(ux, uy + 1, 6.8, 3.8, S.umbrella);
+    for (let i = -1; i <= 1; i++) rect(ux + i * 4, uy - 1, 1, 4, S.umbrellaHi);
+    for (let i = -1; i <= 1; i++) {        // scalloped hem
+      ell(ux + i * 4.5, uy + 4, 2.1, 1.7, O);
+      ell(ux + i * 4.5, uy + 3.7, 1.5, 1.2, S.umbrella);
+    }
+    rect(ux, uy - 6, 1, 5, '#c9a86a');     // ferrule
+    ell(ux, uy - 6, 1.4, 1.4, '#ffd34d');
+    rect(fhX - face, fhY + 4, 1, 3, '#7a6450');   // crook handle
+    rect(fhX - face * 2, fhY + 6, 2, 1, '#7a6450');
   }
 
   if (S.ball) {   // basketball tucked against the front hand
@@ -2319,34 +2367,38 @@ function drawCtrlBtn() {
 // screen quarters, so these are a guide, not the target.
 function drawTouchPad() {
   if (controlMode !== 'pad') return;
-  const by = VH - 30;
-  // solid triangles: one pixel at the tip widening to the base
-  const padBtn = (x, pointLeft, lit) => {
-    ctx.globalAlpha = lit ? 0.55 : 0.26;
-    rect(x, by, 24, 24, '#0d1a14');
-    ctx.globalAlpha = lit ? 1 : 0.62;
-    rect(x, by, 24, 1, P.hud); rect(x, by + 23, 24, 1, P.hud);
-    rect(x, by, 1, 24, P.hud); rect(x + 23, by, 1, 24, P.hud);
-    for (let i = 0; i < 7; i++) {
-      const h = 1 + i * 2;
-      const px = pointLeft ? x + 9 + i : x + 15 - i;
-      rect(px, by + 12 - Math.floor(h / 2), 1, h, P.hud);
+  const cy = VH - 34;
+
+  // Faint full-height dividers mark where one zone ends and the next begins.
+  ctx.globalAlpha = 0.10;
+  rect(Math.round(VW * 0.25), 0, 1, VH, P.hud);
+  rect(Math.round(VW * 0.5), 0, 1, VH, P.hud);
+  ctx.globalAlpha = 1;
+
+  // One big translucent arrow centred in each zone, so it is obvious which
+  // part of the screen gives which direction. These mark the zones; the whole
+  // full-height slice is live, not just the glyph.
+  const bigArrow = (cx, dir, lit) => {
+    const a = lit ? 0.52 : 0.21;
+    for (let pass = 0; pass < 2; pass++) {
+      ctx.globalAlpha = pass === 0 ? a * 0.85 : a;
+      const col = pass === 0 ? '#0a1510' : P.hud;
+      const off = pass === 0 ? 1 : 0;
+      for (let i = 0; i < 12; i++) {
+        const w = 1 + i * 2;
+        if (dir === 'left') rect(cx - 6 + i + off, cy - Math.floor(w / 2) + off, 1, w, col);
+        else if (dir === 'right') rect(cx + 6 - i + off, cy - Math.floor(w / 2) + off, 1, w, col);
+        else rect(cx - Math.floor(w / 2) + off, cy - 6 + i + off, w, 1, col);
+      }
     }
     ctx.globalAlpha = 1;
   };
-  padBtn(8, true, input.left);
-  padBtn(36, false, input.right);
 
-  const jcx = VW - 22, jcy = by + 12;
-  const lit = !player.onGround;
-  ctx.globalAlpha = lit ? 0.55 : 0.26;
-  ell(jcx, jcy, 15, 15, '#0d1a14');
-  ctx.globalAlpha = lit ? 1 : 0.62;
-  for (let i = 0; i < 6; i++) {           // up triangle
-    const w = 1 + i * 2;
-    rect(jcx - Math.floor(w / 2), jcy - 9 + i, w, 1, P.hud);
-  }
-  drawTextCentered('JUMP', jcx, jcy + 1, 1, P.hud);
+  bigArrow(Math.round(VW * 0.125), 'left', input.left);
+  bigArrow(Math.round(VW * 0.375), 'right', input.right);
+  bigArrow(Math.round(VW * 0.75), 'up', !player.onGround);
+  ctx.globalAlpha = !player.onGround ? 0.6 : 0.24;
+  drawTextCentered('JUMP', Math.round(VW * 0.75), cy + 9, 1, P.hud);
   ctx.globalAlpha = 1;
 }
 
