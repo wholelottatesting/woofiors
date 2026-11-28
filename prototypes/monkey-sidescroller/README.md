@@ -78,7 +78,7 @@ unlocked — including after a game over. Your pick and your unlocks persist in
 |---|---|
 | **Mono** — the grey stuffed monkey | default |
 | **Arthur** — five years old, dark blonde hair, red shoes | beating level 1 |
-| **Mommy** — dark curly hair, fairy wings, tiara and star wand | beating level 2 |
+| **Mommy** — fairy: four gauzy wings, flower crown, petal skirt, star wand | beating level 2 |
 | **Daddy** — tall, short black hair, jersey, carrying a basketball | beating level 3 |
 | **Toby** — merle tri-colour bernedoodle | beating level 4 |
 | **Nana** — grandma as Mary Poppins: boater, bun, umbrella | beating level 5 |
@@ -93,7 +93,7 @@ All characters share one animation rig and one hitbox, so they play
 identically. A skin swaps colours and toggles features — `muzzle`, `tail`,
 `curly` / `shortHair` / `longHair`, `hat`, `crown`, `wings`, `wand`, `ball`,
 `mane`, `hood`, `spout`, `fluke`, `animalEar`, `glasses`, `moustache`, `bow`,
-`boater`, `bun`, `bowtie`, `umbrella`,
+`boater`, `bun`, `bowtie`, `umbrella`, `petalSkirt`, `flowerCrown`, `sparkle`,
 and `lift` for a taller build. Toby sets `quad: true` and takes a separate
 four-legged body plan that reuses the same animation parameters, so his run
 and jump timing match everyone else's.

@@ -705,15 +705,16 @@ const SKINS = {
   },
   mommy: {
     name: 'MOMMY', blurb: 'GOOD FAIRY',
-    torso: '#c86fb0', torsoShade: '#9c4e89', belly: '#e79ad0', bellyDark: '#b35f9c',
+    torso: '#e86fa8', torsoShade: '#b84a80', belly: '#ffd0e4', bellyDark: '#d992b4',
     head: '#f7d3b0', headHi: '#ffe6c8',
     arm: '#f7d3b0', armBack: '#d4ab87', hand: '#f7d3b0', handBack: '#d4ab87',
-    leg: '#9c4e89', legBack: '#7a3a6b', foot: '#ffd34d', footBack: '#d9a62b',
+    leg: '#f7d3b0', legBack: '#d4ab87', foot: '#6cc96a', footBack: '#49a05a',
     ear: 7.5, earOuter: '#f7d3b0', earInner: '#dcb08c',
     muzzle: false, tail: null, patch: false,
     hair: '#2b2026', hairHi: '#4d3a44', curly: true,
-    wings: '#cfe8ff', wingsHi: '#ffffff',
-    crown: '#ffd34d', crownGem: '#7fe6c8',
+    wings: '#e2f6ff', wingsFar: '#a9d4e8', wingsHi: '#ffffff', wingsVein: '#86bcd6',
+    petalSkirt: true, sparkle: '#9ff0e0',
+    flowerCrown: true, flowerA: '#fff0a8', flowerB: '#ffd0e4',
     wand: '#c9a86a', wandStar: '#ffe98a',
     brow: '#2b2026', line: '#9a6a52'
   },
@@ -968,9 +969,9 @@ function drawMonkey(cx, feetY, a, skinId) {
     armFx = 6;
     armFy = -3 + Math.sin(a.phase) * 0.9;
   }
-  if (S.wand) {   // front arm holds the wand up
-    armFx = 5;
-    armFy = -9 + Math.sin(a.phase) * 1.2;
+  if (S.wand) {   // front arm holds the wand out, clear of the head
+    armFx = 7;
+    armFy = -4 + Math.sin(a.phase) * 1.2;
   }
   if (S.umbrella) {
     armFx = 5;
@@ -1013,16 +1014,42 @@ function drawMonkey(cx, feetY, a, skinId) {
     }
   }
 
-  /* ---- fairy wings, behind the body ---- */
+  /* ---- fairy wings, behind the body ----
+     Two pairs, the far pair dimmer for depth, reaching up past the shoulders
+     so they are silhouetted against the background instead of hidden behind
+     the torso. This is the whole fairy read, so they are deliberately big. */
   if (S.wings) {
-    const flut = Math.sin(a.phase * 3) * 1.3;
-    for (const up of [true, false]) {
-      const ox = bx - face * (up ? 8 : 6);
-      const oy = bodyY - (up ? 6 : 1) + flut * (up ? 1 : -0.6);
-      const rx = up ? 7 : 5.2, ry = up ? 5 : 3.4;
-      ell(ox, oy, rx + 0.9, ry + 0.9, O);
-      ell(ox, oy, rx, ry, S.wings);
-      ell(ox - face, oy - 1, rx * 0.45, ry * 0.4, S.wingsHi);
+    const flut = Math.sin(a.phase * 3) * 1.8;
+    const pairs = [
+      { ox: -14, oy: -9, rx: 8.5, ry: 6, a: 0.5 },
+      { ox: -12, oy: 1, rx: 6.5, ry: 4.5, a: 0.5 },
+      { ox: -11, oy: -12, rx: 10, ry: 7.5, a: 0.82 },
+      { ox: -10, oy: 0, rx: 7.5, ry: 5.5, a: 0.82 }
+    ];
+    for (const w of pairs) {
+      const ox = bx + w.ox * face;
+      const oy = bodyY + w.oy + flut * (w.oy < 0 ? 1 : -0.6);
+      ctx.globalAlpha = w.a;                       // gauzy, not solid
+      ell(ox, oy, w.rx + 1, w.ry + 1, O);
+      ell(ox, oy, w.rx, w.ry, w.a > 0.6 ? S.wings : S.wingsFar);
+      ell(ox - face * 2, oy - 1.5, w.rx * 0.45, w.ry * 0.35, S.wingsHi);
+      ctx.globalAlpha = Math.min(1, w.a + 0.15);
+      rect(ox - w.rx * 0.75, oy, Math.round(w.rx * 1.4), 1, S.wingsVein);
+      rect(ox, oy - Math.round(w.ry * 0.65), 1, Math.round(w.ry * 1.3), S.wingsVein);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  /* ---- pixie dust ---- */
+  if (S.sparkle) {
+    for (let i = 0; i < 5; i++) {
+      const t = a.phase * 1.4 + i * 1.7;
+      if (Math.sin(t * 3) < 0.1) continue;
+      const px = Math.round(bx - face * (9 + Math.sin(t) * 8));
+      const py = Math.round(bodyY - 4 + Math.cos(t * 1.3) * 11);
+      rect(px, py, 1, 1, '#ffffff');
+      rect(px - 1, py, 1, 1, S.sparkle);
+      rect(px + 1, py, 1, 1, S.sparkle);
     }
   }
 
@@ -1047,6 +1074,16 @@ function drawMonkey(cx, feetY, a, skinId) {
   } else {         // collar + shirt hem
     rect(bx - 3, bodyY - 5, 7, 1, S.torsoShade);
     rect(bx - 4, bodyY + 5, 9, 1, S.torsoShade);
+  }
+  if (S.petalSkirt) {   // short scalloped petal skirt, so the legs show
+    for (let pass = 0; pass < 2; pass++) {
+      for (let i = -2; i <= 2; i++) {
+        const px = bx + i * 3, py = bodyY + 6 + Math.abs(i) * 0.8;
+        if (pass === 0) ell(px, py, 3.4, 3.6, O);
+        else ell(px, py, 2.6, 2.8, i % 2 ? S.torso : S.belly);
+      }
+    }
+    ell(bx, bodyY + 4, 5.4, 2.2, S.torsoShade);
   }
   if (S.bowtie) {  // high white collar with a red bow at the throat
     rect(bx - 4, bodyY - 6, 9, 2, '#f2efe6');
@@ -1176,7 +1213,15 @@ function drawMonkey(cx, feetY, a, skinId) {
     rect(bx + 4 * face, headY - 11, 2, 2, S.hairHi);
   }
 
-  if (S.crown) {   // fairy tiara
+  if (S.flowerCrown) {   // ring of little blossoms, not a tiara
+    for (let i = -2; i <= 2; i++) {
+      const fx = bx + i * 4, fy = headY - 7 + Math.abs(i) * 1.2;
+      ell(fx, fy, 2.2, 1.9, O);
+      ell(fx, fy, 1.5, 1.3, i % 2 ? S.flowerA : S.flowerB);
+      rect(fx, fy, 1, 1, '#fff2b0');
+    }
+  }
+  if (S.crown) {   // tiara
     rect(bx - 5, headY - 8, 11, 1, S.crown);
     rect(bx - 5, headY - 9, 1, 1, S.crown);
     rect(bx + 5, headY - 9, 1, 1, S.crown);
@@ -1275,7 +1320,7 @@ function drawMonkey(cx, feetY, a, skinId) {
   ell(fhX, fhY + 1, 1.6, 1.4, S.hand);
 
   if (S.wand) {   // star wand, held aloft, trailing sparkles
-    const wtX = fhX + 2 * face, wtY = fhY - 8;
+    const wtX = fhX + 3 * face, wtY = fhY - 10;
     limb(fhX, fhY, wtX, wtY, 3, O);
     limb(fhX, fhY, wtX, wtY, 1, S.wand);
     rect(wtX - 2, wtY, 5, 1, S.wandStar);
