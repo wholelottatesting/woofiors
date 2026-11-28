@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#0a0f0c">
-<title>Monkey Jungle Dash</title>
+<title>Mono's Jungle</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100%; width: 100%;
@@ -37,7 +37,7 @@
 <script>
 "use strict";
 /* ============================================================
-   MONKEY JUNGLE DASH — old-school 2D side scroller
+   MONO'S JUNGLE — old-school 2D side scroller
    Controls: tap LEFT half = jump · hold RIGHT half = run
    ============================================================ */
 
@@ -2274,8 +2274,8 @@ function drawTitle(t) {
   drawPanel(cx - panelW / 2, 24, panelW, 124);
 
   const bounce = Math.round(Math.sin(t * 3) * 2);
-  drawTextCentered('MONKEY', cx, 32 + bounce, 3, '#ffd34d', '#5a3b0e');
-  drawTextCentered('JUNGLE DASH', cx, 52 + bounce, 2, '#9ff0b4', '#15402a');
+  drawTextCentered("MONO'S", cx, 30 + bounce, 3, '#ffd34d', '#5a3b0e');
+  drawTextCentered('JUNGLE', cx, 50 + bounce, 3, '#9ff0b4', '#15402a');
 
   // stand them on the panel's lower edge rather than floating mid-panel
   drawMonkey(cx - panelW / 2 + 26, 145, { state: 'idle', phase: t * 2, face: 1, blink: player.blink }, 'mono');

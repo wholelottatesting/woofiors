@@ -1,4 +1,4 @@
-# Monkey Jungle Dash 🐒
+# Mono's Jungle 🐒
 
 A 2D side-scrolling platformer built to be played in a browser on an iPhone.
 Old-school pixel art, a procedurally generated jungle, and a chiptune soundtrack —
