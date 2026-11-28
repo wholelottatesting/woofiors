@@ -16,17 +16,42 @@ Then open `http://<host>:8411/` on a phone. Hold it **sideways** — the game is
 
 ## Controls
 
+Two schemes, toggled by the `PAD` / `TAP` button on the title screen. The
+choice persists in `localStorage`.
+
+**`PAD` (default)** — the console convention: movement under the left thumb,
+jump under the right.
+
 | Input | Action |
 |---|---|
-| Tap **left half** | Jump |
-| Hold **right half** | Run (release to stop) |
-| On a ladder | Hold = travel forward (up an up-ladder, down a down-ladder); release = backtrack |
-| Tap left on a ladder | Leap off |
-| Speaker icon (top centre) | Mute / unmute |
-| `DAY/NITE` button (title screen) | Force the time of day |
+| Left quarter of the screen | Move left |
+| Second quarter | Move right |
+| Right half | Jump |
 
-Keyboard equivalents for desktop testing: `→`/`D` to run, `Space`/`↑`/`W` to
+**`TAP`** — the original one-direction scheme.
+
+| Input | Action |
+|---|---|
+| Tap left half | Jump |
+| Hold right half | Run right (release to stop) |
+
+Hit zones are full-height screen slices, not the drawn buttons, so there is
+nothing to miss with a thumb. Sliding a thumb between the two movement zones
+hands over cleanly; sliding *into* the jump zone deliberately does not fire a
+jump.
+
+On a ladder under `PAD`, right climbs forward, left climbs back, and letting
+go holds position. Under `TAP` there is no back button, so releasing
+descends. Jumping always leaps off.
+
+Keyboard for desktop testing: `←`/`→` or `A`/`D` to move, `Space`/`↑`/`W` to
 jump, `M` to mute.
+
+Because movement is now two-way, the camera uses a window (the player sits at
+32% of the screen running right, and can drift back to 15% before the view
+follows) and there is an invisible wall at the far left of each level, plus a
+hard floor at the terrain-pruning boundary so backtracking can never reach
+deleted ground.
 
 ## Levels
 

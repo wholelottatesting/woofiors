@@ -1308,7 +1308,7 @@ function levelCfg(n) {
 let cfg = levelCfg(1);
 let camX = 0, shake = 0, flashT = 0;
 let platforms = [], obstacles = [], coins = [], particles = [], floaters = [], ladders = [];
-let genX = 0, lastGroundY = 0, lastLadderX = -9999;
+let genX = 0, lastGroundY = 0, lastLadderX = -9999, prunedX = -99999, levelMinX = -60;
 const CLIMB_SPD = 56;      // forward (hold) climb speed, px/s
 const LADDER_RISE = 48;    // taller than the 42px jump apex, so the ladder is the way up
 let best = 0;
@@ -1321,7 +1321,35 @@ const player = {
   onLadder: false, ladder: null, ladderCD: 0, ladderHintT: 0, sawLadder: false
 };
 
-const input = { run: false, jumpQueued: false, runTouch: new Set() };
+/* Two control schemes.
+   'pad'  — the console convention: left thumb moves (left/right), right thumb
+            jumps. Zones span the full height so there is nothing to miss; the
+            drawn buttons are affordances, not the hit targets.
+   'tap'  — the original: tap the left half to jump, hold the right half to run. */
+let controlMode = 'pad';
+try { controlMode = localStorage.getItem('mjd_controls') || 'pad'; } catch (e) {}
+
+const input = { left: false, right: false, run: false, jumpQueued: false };
+const touchZones = new Map();   // touch id -> zone, so a thumb can slide between buttons
+
+function zoneAt(x) {
+  if (controlMode === 'pad') {
+    if (x < VW * 0.25) return 'left';
+    if (x < VW * 0.5) return 'right';
+    return 'jump';
+  }
+  return x < VW * 0.5 ? 'jump' : 'right';
+}
+
+function refreshMove() {
+  input.left = false;
+  input.right = false;
+  for (const z of touchZones.values()) {
+    if (z === 'left') input.left = true;
+    else if (z === 'right') input.right = true;
+  }
+  input.run = input.right;        // legacy alias used by the 'tap' scheme
+}
 
 /* ---------------- level generation ---------------- */
 const LEVELS_Y = [140, 124, 108, 92];
@@ -1510,9 +1538,10 @@ function genChunk() {
 
 function ensureLevel() {
   while (!levelGenDone && genX < camX + VW + 320) genChunk();
-  // prune behind
-  const cut = camX - 160;
-  if (platforms.length > 80) platforms = platforms.filter(p => p.x + p.w > cut);
+  // prune behind. Keep a wider margin now that the player can walk back,
+  // and remember the boundary so they can never reach deleted ground.
+  const cut = camX - 420;
+  if (platforms.length > 80) { platforms = platforms.filter(p => p.x + p.w > cut); prunedX = Math.max(prunedX, cut); }
   if (obstacles.length > 60) obstacles = obstacles.filter(o => o.x + o.w > cut);
   if (coins.length > 160) coins = coins.filter(c => c.x > cut);
   if (floaters.length > 40) floaters = floaters.filter(f => f.x > cut);
@@ -1523,7 +1552,7 @@ function resetGame(keepBananas) {
   platforms = []; obstacles = []; coins = []; particles = []; floaters = []; ladders = [];
   camX = 0; genX = 0; lastGroundY = 140; shake = 0; flashT = 0;
   lastObstacleX = -9999; lastLadderX = -9999;
-  goal = null; levelGenDone = false;
+  goal = null; levelGenDone = false; prunedX = -99999; levelMinX = -56;
   cfg = levelCfg(level);
   addPlatform(-80, 140, 260);     // generous safe start
   genX = 180;
@@ -1692,13 +1721,23 @@ function tryGrabLadder() {
 function updateLadder(dt) {
   const L = player.ladder;
   const forwardIsUp = L.dir === 'up';
-  const goingUp = input.run ? forwardIsUp : !forwardIsUp;
-  const spd = input.run ? CLIMB_SPD : CLIMB_SPD * 0.75;
-  player.y += (goingUp ? -spd : spd) * dt;
+  // With a d-pad, right climbs forward and left climbs back, and letting go
+  // holds position. The tap scheme has no "back" button, so releasing
+  // descends instead.
+  let move;
+  if (controlMode === 'pad') move = input.right ? 1 : (input.left ? -1 : 0);
+  else move = input.run ? 1 : -1;
+
   player.x += (L.x - player.x) * Math.min(1, dt * 14);
   player.vx = 0; player.vy = 0;
   player.face = 1;
   player.state = 'climb';
+
+  if (move === 0) { player.phase += dt * 1.5; return; }   // hanging on
+
+  const goingUp = move > 0 ? forwardIsUp : !forwardIsUp;
+  const spd = move > 0 ? CLIMB_SPD : CLIMB_SPD * 0.75;
+  player.y += (goingUp ? -spd : spd) * dt;
   player.phase += dt * 7;
   if (player.y <= L.top) exitLadder(L, 'top');
   else if (player.y >= L.bottom) exitLadder(L, 'bottom');
@@ -1740,6 +1779,19 @@ function inTheme(x, y) {
   return x >= b.x - 4 && x <= b.x + b.w + 6 && y >= b.y - 4 && y <= b.y + b.h + 6;
 }
 
+const CTRL_BTN = () => ({ x: 57, y: 4, w: 40, h: 16 });
+function inCtrl(x, y) {
+  if (state !== 'title') return false;
+  const b = CTRL_BTN();
+  return x >= b.x - 3 && x <= b.x + b.w + 5 && y >= b.y - 4 && y <= b.y + b.h + 6;
+}
+function cycleControls() {
+  controlMode = controlMode === 'pad' ? 'tap' : 'pad';
+  try { localStorage.setItem('mjd_controls', controlMode); } catch (e) {}
+  touchZones.clear();
+  refreshMove();
+}
+
 function toLogical(clientX, clientY) {
   const r = canvas.getBoundingClientRect();
   return { x: (clientX - r.left) / (r.width / VW), y: (clientY - r.top) / (r.height / VH) };
@@ -1749,6 +1801,7 @@ function pressAt(x, y, id) {
   AU.unlock();
   if (inMute(x, y)) { AU.toggleMute(); return 'mute'; }
   if (inTheme(x, y)) { cycleTheme(); AU.blip(620, 0.07, 'square', 0.22); return 'theme'; }
+  if (inCtrl(x, y)) { cycleControls(); AU.blip(760, 0.07, 'square', 0.22); return 'ctrl'; }
 
   if (state === 'select') {                     // pick a character
     for (const s of charSlots()) {
@@ -1765,13 +1818,15 @@ function pressAt(x, y, id) {
   if (state === 'title') {
     beginFromMenu(1, false);
     if (state !== 'play') return 'ui';
-    // else fall through: a hold on the right that starts the game must also
-    // start the run, or the first press feels dead
+    // else fall through: the press that starts the game should also register,
+    // or the first touch feels dead
   }
-  if (x < VW / 2) { input.jumpQueued = true; return 'jump'; }
-  input.run = true;
-  if (id !== undefined) input.runTouch.add(id);
-  return 'run';
+
+  const z = zoneAt(x);
+  if (z === 'jump') { input.jumpQueued = true; }
+  if (id !== undefined) touchZones.set(id, z);
+  refreshMove();
+  return z;
 }
 
 canvas.addEventListener('touchstart', (e) => {
@@ -1782,23 +1837,35 @@ canvas.addEventListener('touchstart', (e) => {
   }
 }, { passive: false });
 
+// Sliding a thumb from one movement button to the other should hand over
+// cleanly. Sliding *into* the jump zone deliberately does not fire a jump.
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if (state !== 'play') return;
+  let changed = false;
+  for (const t of e.changedTouches) {
+    if (!touchZones.has(t.identifier)) continue;
+    const p = toLogical(t.clientX, t.clientY);
+    const z = zoneAt(p.x);
+    if (touchZones.get(t.identifier) !== z) { touchZones.set(t.identifier, z); changed = true; }
+  }
+  if (changed) refreshMove();
+}, { passive: false });
+
 function endTouch(e) {
   e.preventDefault();
-  for (const t of e.changedTouches) {
-    if (input.runTouch.has(t.identifier)) input.runTouch.delete(t.identifier);
-  }
-  if (input.runTouch.size === 0) input.run = false;
+  for (const t of e.changedTouches) touchZones.delete(t.identifier);
+  refreshMove();
 }
 canvas.addEventListener('touchend', endTouch, { passive: false });
 canvas.addEventListener('touchcancel', endTouch, { passive: false });
-canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
 // mouse (desktop testing)
 canvas.addEventListener('mousedown', (e) => {
   const p = toLogical(e.clientX, e.clientY);
   pressAt(p.x, p.y, 'mouse');
 });
-window.addEventListener('mouseup', () => { input.runTouch.delete('mouse'); if (input.runTouch.size === 0) input.run = false; });
+window.addEventListener('mouseup', () => { touchZones.delete('mouse'); refreshMove(); });
 
 // keyboard
 window.addEventListener('keydown', (e) => {
@@ -1819,7 +1886,11 @@ window.addEventListener('keydown', (e) => {
   }
   if (k === 'arrowright' || k === 'd') {
     if (state !== 'play') advance();
-    input.run = true;
+    input.right = true; input.run = true;
+  }
+  if (k === 'arrowleft' || k === 'a') {
+    if (state !== 'play') advance();
+    input.left = true;
   }
   if (k === 'c' && state === 'select') {
     const list = unlockedList();
@@ -1828,7 +1899,8 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => {
   const k = e.key.toLowerCase();
-  if (k === 'arrowright' || k === 'd') input.run = false;
+  if (k === 'arrowright' || k === 'd') { input.right = false; input.run = false; }
+  if (k === 'arrowleft' || k === 'a') input.left = false;
 });
 
 document.addEventListener('visibilitychange', () => {
@@ -1878,9 +1950,7 @@ function update(dt) {
   if (player.onLadder) {
     // climbing replaces normal physics entirely; just keep the camera with us
     player.dist = Math.max(player.dist, player.x - player.startX);
-    const camT = Math.max(0, player.x - VW * 0.32);
-    camX += (camT - camX) * Math.min(1, dt * 11);
-    if (camX < 0) camX = 0;
+    camX = cameraTarget(dt);
     ensureLevel();
     updateCoins(dt);
     updateParticles(dt);
@@ -1898,10 +1968,12 @@ function update(dt) {
   }
 
   // horizontal
-  if (input.run) {
-    player.vx += ACCEL * dt;
+  const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+  if (dir !== 0) {
+    player.vx += ACCEL * dt * dir;
     if (player.vx > MAX_SPD) player.vx = MAX_SPD;
-    player.face = 1;
+    if (player.vx < -MAX_SPD) player.vx = -MAX_SPD;
+    player.face = dir;
   } else {
     const dec = (player.onGround ? GROUND_FRICTION : AIR_DRAG) * dt;
     if (player.vx > 0) player.vx = Math.max(0, player.vx - dec);
@@ -1931,11 +2003,14 @@ function update(dt) {
   if (player.state === 'run') player.phase += dt * (6 + Math.abs(player.vx) * 0.075);
   else player.phase += dt * 3;
 
+  // Invisible wall at the far left: you can backtrack, but not off the start
+  // of the level, and never into terrain that has already been pruned away.
+  const backFloor = Math.max(prunedX + 24, levelMinX);
+  if (player.x < backFloor) { player.x = backFloor; if (player.vx < 0) player.vx = 0; }
+
   // distance / camera
   player.dist = Math.max(player.dist, player.x - player.startX);
-  const targetCam = Math.max(0, player.x - VW * 0.32);
-  camX += (targetCam - camX) * Math.min(1, dt * 11);
-  if (camX < 0) camX = 0;
+  camX = cameraTarget(dt);
 
   ensureLevel();
   updateCoins(dt);
@@ -1945,6 +2020,20 @@ function update(dt) {
   if (player.onGround && Math.abs(player.vx) > 90 && Math.random() < 0.35) {
     puff(player.x - 5, player.y, '#c6b188');
   }
+}
+
+/* Camera window rather than a fixed offset: running right pushes the player to
+   32% of the screen (good lookahead), backtracking lets them drift back to 15%
+   before the view follows, so small corrections don't swing the camera. */
+function cameraTarget(dt) {
+  const aheadX = player.x - VW * 0.32;
+  const behindX = player.x - VW * 0.15;
+  let target = camX;
+  if (camX < aheadX) target = aheadX;
+  else if (camX > behindX) target = behindX;
+  if (target < 0) target = 0;
+  let next = camX + (target - camX) * Math.min(1, dt * 11);
+  return next < 0 ? 0 : next;
 }
 
 function updateCoins(dt) {
@@ -2207,6 +2296,60 @@ function drawThemeBtn() {
   drawText(label, b.x + 16, b.y + 6, 1, P.hud, '#0a140e');
 }
 
+function drawCtrlBtn() {
+  const b = CTRL_BTN();
+  ctx.globalAlpha = 0.45;
+  rect(b.x, b.y, b.w, b.h, '#0d1a14');
+  ctx.globalAlpha = 1;
+  rect(b.x, b.y, b.w, 1, '#2a4536'); rect(b.x, b.y + b.h - 1, b.w, 1, '#2a4536');
+  rect(b.x, b.y, 1, b.h, '#2a4536'); rect(b.x + b.w - 1, b.y, 1, b.h, '#2a4536');
+  const cx = b.x + 8, cy = b.y + 8;
+  if (controlMode === 'pad') {           // tiny d-pad glyph
+    rect(cx - 4, cy - 1, 9, 3, '#9ff0b4');
+    rect(cx - 1, cy - 4, 3, 9, '#9ff0b4');
+    rect(cx - 1, cy - 1, 3, 3, '#4f8f6a');
+  } else {                                // two screen halves
+    rect(cx - 5, cy - 4, 4, 9, '#9ff0b4');
+    rect(cx + 1, cy - 4, 4, 9, '#5a8f74');
+  }
+  drawText(controlMode === 'pad' ? 'PAD' : 'TAP', b.x + 17, b.y + 6, 1, P.hud, '#0a140e');
+}
+
+// On-screen affordances for the pad scheme. The real hit zones are full-height
+// screen quarters, so these are a guide, not the target.
+function drawTouchPad() {
+  if (controlMode !== 'pad') return;
+  const by = VH - 30;
+  // solid triangles: one pixel at the tip widening to the base
+  const padBtn = (x, pointLeft, lit) => {
+    ctx.globalAlpha = lit ? 0.55 : 0.26;
+    rect(x, by, 24, 24, '#0d1a14');
+    ctx.globalAlpha = lit ? 1 : 0.62;
+    rect(x, by, 24, 1, P.hud); rect(x, by + 23, 24, 1, P.hud);
+    rect(x, by, 1, 24, P.hud); rect(x + 23, by, 1, 24, P.hud);
+    for (let i = 0; i < 7; i++) {
+      const h = 1 + i * 2;
+      const px = pointLeft ? x + 9 + i : x + 15 - i;
+      rect(px, by + 12 - Math.floor(h / 2), 1, h, P.hud);
+    }
+    ctx.globalAlpha = 1;
+  };
+  padBtn(8, true, input.left);
+  padBtn(36, false, input.right);
+
+  const jcx = VW - 22, jcy = by + 12;
+  const lit = !player.onGround;
+  ctx.globalAlpha = lit ? 0.55 : 0.26;
+  ell(jcx, jcy, 15, 15, '#0d1a14');
+  ctx.globalAlpha = lit ? 1 : 0.62;
+  for (let i = 0; i < 6; i++) {           // up triangle
+    const w = 1 + i * 2;
+    rect(jcx - Math.floor(w / 2), jcy - 9 + i, w, 1, P.hud);
+  }
+  drawTextCentered('JUMP', jcx, jcy + 1, 1, P.hud);
+  ctx.globalAlpha = 1;
+}
+
 function drawMuteBtn() {
   const b = MUTE_BTN();
   ctx.globalAlpha = 0.45;
@@ -2285,12 +2428,13 @@ function drawTitle(t) {
   const dy = 74;
   drawPanel(cx - 56, dy, 52, 30);
   drawPanel(cx + 4, dy, 52, 30);
-  drawTextCentered('TAP', cx - 30, dy + 6, 1, '#ffd34d');
-  drawTextCentered('LEFT', cx - 30, dy + 13, 1, P.hud);
-  drawTextCentered('JUMP', cx - 30, dy + 20, 1, '#9ff0b4');
-  drawTextCentered('HOLD', cx + 30, dy + 6, 1, '#ffd34d');
-  drawTextCentered('RIGHT', cx + 30, dy + 13, 1, P.hud);
-  drawTextCentered('RUN', cx + 30, dy + 20, 1, '#9ff0b4');
+  const pad = controlMode === 'pad';
+  drawTextCentered(pad ? 'LEFT' : 'TAP', cx - 30, dy + 6, 1, '#ffd34d');
+  drawTextCentered(pad ? 'THUMB' : 'LEFT', cx - 30, dy + 13, 1, P.hud);
+  drawTextCentered(pad ? 'MOVE' : 'JUMP', cx - 30, dy + 20, 1, '#9ff0b4');
+  drawTextCentered(pad ? 'RIGHT' : 'HOLD', cx + 30, dy + 6, 1, '#ffd34d');
+  drawTextCentered(pad ? 'THUMB' : 'RIGHT', cx + 30, dy + 13, 1, P.hud);
+  drawTextCentered(pad ? 'JUMP' : 'RUN', cx + 30, dy + 20, 1, '#9ff0b4');
 
   if (Math.floor(t * 2) % 2 === 0) {
     drawTextCentered('TAP TO START', cx, 112, 2, '#ffffff', '#1d2a22');
@@ -2470,8 +2614,8 @@ function render() {
   rect(0, 0, VW, 10, P.topShade);
   ctx.globalAlpha = 1;
 
-  if (state === 'play') drawHUD();
-  if (state === 'title') { drawTitle(tGlobal); drawMuteBtn(); drawThemeBtn(); }
+  if (state === 'play') { drawHUD(); drawTouchPad(); }
+  if (state === 'title') { drawTitle(tGlobal); drawMuteBtn(); drawThemeBtn(); drawCtrlBtn(); }
   if (state === 'select') { drawSelect(tGlobal); }   // heading occupies the mute slot
   if (state === 'complete') { drawHUD(); drawComplete(tGlobal); }
   if (state === 'over') { drawHUD(); drawOver(tGlobal); }
@@ -2510,6 +2654,10 @@ globalThis.MJD = {
   get obstacles() { return obstacles; },
   get camX() { return camX; },
   get VW() { return VW; },
+  get VH() { return VH; },
+  get controlMode() { return controlMode; },
+  get prunedX() { return prunedX; },
+  cycleControls,
   get level() { return level; },
   get cfg() { return cfg; },
   get goal() { return goal; },
