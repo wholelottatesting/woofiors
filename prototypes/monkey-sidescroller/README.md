@@ -51,18 +51,29 @@ unlocked — including after a game over. Your pick and your unlocks persist in
 |---|---|
 | **Mono** — the grey stuffed monkey | default |
 | **Arthur** — five years old, dark blonde hair, red shoes | beating level 1 |
-| **Mommy** — dark curly hair, witch hat and robe | beating level 2 |
+| **Mommy** — dark curly hair, fairy wings, tiara and star wand | beating level 2 |
 | **Daddy** — tall, short black hair, jersey, carrying a basketball | beating level 3 |
 | **Toby** — merle tri-colour bernedoodle | beating level 4 |
+| **Nana** — grandma in a lion costume, mane and glasses | beating level 5 |
+| **Gammy** — grandma in a whale costume, hood, spout and fluke | beating level 6 |
+| **Zayde** — grandpa in a black bear costume, glasses and moustache | beating level 7 |
+| **Hellen** — five years old, brown bob and a bow | beating level 8 |
+
+Add a character by adding a `SKINS` entry and one line to `UNLOCK_AT`; the
+roster order, the unlock panel and the grid layout all derive from those.
 
 All characters share one animation rig and one hitbox, so they play
-identically; a skin swaps colours and toggles features (muzzle, tail, curly
-hair, hat, basketball). Toby sets `quad: true` and takes a separate
+identically. A skin swaps colours and toggles features — `muzzle`, `tail`,
+`curly` / `shortHair` / `longHair`, `hat`, `crown`, `wings`, `wand`, `ball`,
+`mane`, `hood`, `spout`, `fluke`, `animalEar`, `glasses`, `moustache`, `bow`,
+and `lift` for a taller build. Toby sets `quad: true` and takes a separate
 four-legged body plan that reuses the same animation parameters, so his run
 and jump timing match everyone else's.
 
-The roster grid reflows: one row in landscape, wrapping to multiple shorter
-rows in portrait as the cast grows.
+The roster grid reflows to the viewport: one row in landscape, wrapping to
+more rows as the cast grows. When cells get too short for a whole body it
+switches to clipped head-and-shoulders portraits rather than overflowing, so
+it stays correct in portrait at nine characters and beyond.
 
 ## Level-generation invariants
 

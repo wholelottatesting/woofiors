@@ -704,16 +704,67 @@ const SKINS = {
     brow: '#7a5f2e', line: '#9a6a52'
   },
   mommy: {
-    name: 'MOMMY', blurb: 'GOOD WITCH',
-    torso: '#53307a', torsoShade: '#3a2156', belly: '#6b4196', bellyDark: '#432663',
+    name: 'MOMMY', blurb: 'GOOD FAIRY',
+    torso: '#c86fb0', torsoShade: '#9c4e89', belly: '#e79ad0', bellyDark: '#b35f9c',
     head: '#f7d3b0', headHi: '#ffe6c8',
     arm: '#f7d3b0', armBack: '#d4ab87', hand: '#f7d3b0', handBack: '#d4ab87',
-    leg: '#3a2156', legBack: '#2a1840', foot: '#1b1720', footBack: '#120f16',
+    leg: '#9c4e89', legBack: '#7a3a6b', foot: '#ffd34d', footBack: '#d9a62b',
     ear: 7.5, earOuter: '#f7d3b0', earInner: '#dcb08c',
     muzzle: false, tail: null, patch: false,
     hair: '#2b2026', hairHi: '#4d3a44', curly: true,
-    hat: '#211c29', hatBand: '#8a52c8', hatBuckle: '#ffd34d',
+    wings: '#cfe8ff', wingsHi: '#ffffff',
+    crown: '#ffd34d', crownGem: '#7fe6c8',
+    wand: '#c9a86a', wandStar: '#ffe98a',
     brow: '#2b2026', line: '#9a6a52'
+  },
+  nana: {
+    name: 'NANA', blurb: 'LION GRANDMA',
+    torso: '#d9a257', torsoShade: '#b07c35', belly: '#f0d7a8', bellyDark: '#c9ac78',
+    head: '#f7d3b0', headHi: '#ffe6c8',
+    arm: '#d9a257', armBack: '#b07c35', hand: '#f0d7a8', handBack: '#c9ac78',
+    leg: '#d9a257', legBack: '#b07c35', foot: '#8a5f26', footBack: '#6b4719',
+    ear: 7.5, earOuter: '#f7d3b0', earInner: '#dcb08c',
+    muzzle: false, tail: '#d9a257', tailTuft: '#8a5f26', patch: false, hair: null,
+    mane: '#c8893f', maneDark: '#9a6424',
+    animalEar: '#c8893f', animalEarInner: '#f0d7a8',
+    glasses: '#4a4038',
+    brow: '#8a5f26', line: '#9a6a52'
+  },
+  gammy: {
+    name: 'GAMMY', blurb: 'WHALE GRANDMA',
+    torso: '#4a7fa8', torsoShade: '#356082', belly: '#dff0f7', bellyDark: '#b4ccd9',
+    head: '#f7d3b0', headHi: '#ffe6c8',
+    arm: '#4a7fa8', armBack: '#356082', hand: '#dff0f7', handBack: '#b4ccd9',
+    leg: '#356082', legBack: '#27485f', foot: '#2b6f8f', footBack: '#1d4e66',
+    ear: 7.5, earOuter: '#f7d3b0', earInner: '#dcb08c',
+    muzzle: false, tail: '#4a7fa8', fluke: '#356082', patch: false, hair: null,
+    hood: '#4a7fa8', hoodHi: '#6ba0c9', spout: '#eaf6ff',
+    glasses: '#4a4038',
+    brow: '#5a4a40', line: '#9a6a52'
+  },
+  zayde: {
+    name: 'ZAYDE', blurb: 'BEAR GRANDPA',
+    torso: '#4d423c', torsoShade: '#362e2a', belly: '#8a7262', bellyDark: '#60503f',
+    head: '#f2c79c', headHi: '#ffdcb6',
+    arm: '#4d423c', armBack: '#362e2a', hand: '#8a7262', handBack: '#60503f',
+    leg: '#4d423c', legBack: '#362e2a', foot: '#2e2724', footBack: '#201a18',
+    ear: 7.5, earOuter: '#f2c79c', earInner: '#dba87e',
+    muzzle: false, tail: null, patch: false, hair: null,
+    hood: '#4d423c', hoodHi: '#6f6057',
+    animalEar: '#4d423c', animalEarInner: '#8a6a52',
+    glasses: '#4a4038', moustache: '#cfcac3',
+    brow: '#6b5a4e', line: '#9a6a52'
+  },
+  hellen: {
+    name: 'HELLEN', blurb: 'FIVE YEARS OLD',
+    torso: '#e8a33c', torsoShade: '#c07f22', belly: '#f7c877', bellyDark: '#cfa050',
+    head: '#f7d3b0', headHi: '#ffe6c8',
+    arm: '#f7d3b0', armBack: '#d4ab87', hand: '#f7d3b0', handBack: '#d4ab87',
+    leg: '#f7d3b0', legBack: '#d4ab87', foot: '#e86a8a', footBack: '#b84a66',
+    ear: 7.5, earOuter: '#f7d3b0', earInner: '#dcb08c',
+    muzzle: false, tail: null, patch: false,
+    hair: '#6b4423', hairHi: '#8a5c30', longHair: true, bow: '#e86a8a',
+    brow: '#6b4423', line: '#9a6a52'
   },
   daddy: {
     name: 'DADDY', blurb: 'BALL HANDLER',
@@ -745,7 +796,10 @@ const SKINS = {
 };
 
 // Which level's completion hands over which character.
-const UNLOCK_AT = { 1: 'arthur', 2: 'mommy', 3: 'daddy', 4: 'toby' };
+const UNLOCK_AT = {
+  1: 'arthur', 2: 'mommy', 3: 'daddy', 4: 'toby',
+  5: 'nana', 6: 'gammy', 7: 'zayde', 8: 'hellen'
+};
 let charId = 'mono';
 let unlocked = { mono: true };
 try {
@@ -760,7 +814,13 @@ function saveUnlocks() {
     localStorage.setItem('mjd_char', charId);
   } catch (e) {}
 }
-function unlockedList() { return Object.keys(SKINS).filter(k => unlocked[k]); }
+// Roster reads in the order you earn them, not the order the skins happen to
+// be declared in.
+const CHAR_ORDER = ['mono'].concat(
+  Object.keys(UNLOCK_AT).sort((a, b) => a - b).map(k => UNLOCK_AT[k])
+).filter((k, i, all) => SKINS[k] && all.indexOf(k) === i);
+
+function unlockedList() { return CHAR_ORDER.filter(k => unlocked[k]); }
 
 /* Toby runs on four legs, so he gets his own body plan. He reuses the shared
    animation parameters, which keeps run/jump/fall timing identical to everyone
@@ -908,6 +968,10 @@ function drawMonkey(cx, feetY, a, skinId) {
     armFx = 6;
     armFy = -3 + Math.sin(a.phase) * 0.9;
   }
+  if (S.wand) {   // front arm holds the wand up
+    armFx = 5;
+    armFy = -9 + Math.sin(a.phase) * 1.2;
+  }
 
   const lift = S.lift || 0;             // taller characters sit higher on the same feet
   const bx = cx + tilt * face;          // body center x
@@ -933,6 +997,29 @@ function drawMonkey(cx, feetY, a, skinId) {
     }
     for (let i = 0; i < pts.length - 1; i++) limb(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], 4, O);
     for (let i = 0; i < pts.length - 1; i++) limb(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], 2, S.tail);
+    const tip = pts[pts.length - 1];
+    if (S.tailTuft) {                       // lion's tufted tail
+      ell(tip[0], tip[1], 3.2, 3.2, O);
+      ell(tip[0], tip[1], 2.4, 2.4, S.tailTuft);
+    }
+    if (S.fluke) {                          // whale costume's tail fin
+      ell(tip[0], tip[1], 7, 3.4, O);
+      ell(tip[0] - face * 2, tip[1] - 1, 5.2, 2.2, S.fluke);
+      ell(tip[0] + face * 3, tip[1] - 1, 4.2, 2, S.fluke);
+    }
+  }
+
+  /* ---- fairy wings, behind the body ---- */
+  if (S.wings) {
+    const flut = Math.sin(a.phase * 3) * 1.3;
+    for (const up of [true, false]) {
+      const ox = bx - face * (up ? 8 : 6);
+      const oy = bodyY - (up ? 6 : 1) + flut * (up ? 1 : -0.6);
+      const rx = up ? 7 : 5.2, ry = up ? 5 : 3.4;
+      ell(ox, oy, rx + 0.9, ry + 0.9, O);
+      ell(ox, oy, rx, ry, S.wings);
+      ell(ox - face, oy - 1, rx * 0.45, ry * 0.4, S.wingsHi);
+    }
   }
 
   /* ---- back limbs ---- */
@@ -981,9 +1068,49 @@ function drawMonkey(cx, feetY, a, skinId) {
     ell(ex, ey, earR - 0.9, earR * 1.15 - 0.9, S.earOuter);
     ell(ex + s * 0.4, ey, earR - 2.2, earR * 1.15 - 1.4, S.earInner);
   }
+  // lion mane: a shaggy ring of tufts behind the head
+  if (S.mane) {
+    for (let i = 0; i < 14; i++) {
+      const ang = (i / 14) * Math.PI * 2;
+      const mx = bx + Math.cos(ang) * 10.5, my = headY + Math.sin(ang) * 9.5;
+      ell(mx, my, 4.4, 4.4, O);
+    }
+    for (let i = 0; i < 14; i++) {
+      const ang = (i / 14) * Math.PI * 2;
+      const mx = bx + Math.cos(ang) * 10.5, my = headY + Math.sin(ang) * 9.5;
+      ell(mx, my, 3.5, 3.5, i % 2 ? S.mane : S.maneDark);
+    }
+  }
+
+  // rounded animal ears sit on top of the head (lion, bear)
+  if (S.animalEar) {
+    for (const s of [-1, 1]) {
+      const ax = bx + s * 6.5, ay = headY - 7.5;
+      ell(ax, ay, 4, 4, O);
+      ell(ax, ay, 3.1, 3.1, S.animalEar);
+      ell(ax, ay + 0.5, 1.6, 1.6, S.animalEarInner);
+    }
+  }
+
   ell(bx, headY, 9, 8, O);
   ell(bx, headY, 8, 7, S.head);
   ell(bx - 3 * face, headY - 4, 4, 2, S.headHi);
+
+  // costume hood: a dome over the crown and back of the head, face showing
+  if (S.hood) {
+    ell(bx, headY - 2, 9.6, 8.2, O);
+    ell(bx, headY - 2, 8.8, 7.4, S.hood);
+    ell(bx - 3 * face, headY - 6, 4.2, 2.2, S.hoodHi);
+    // cut the face back out of the dome
+    ell(bx + 2 * face, headY + 1.5, 6.4, 5.4, S.head);
+    ell(bx + 1 * face, headY - 1, 3.4, 1.8, S.headHi);
+  }
+  if (S.spout) {   // whale blowhole spout
+    const puffT = Math.sin(a.phase * 2) * 1.5;
+    rect(bx - 1, headY - 12, 2, 3, S.spout);
+    ell(bx - 3 + puffT, headY - 14, 2.2, 1.8, S.spout);
+    ell(bx + 3 + puffT, headY - 15, 1.8, 1.5, S.spout);
+  }
 
   if (S.patch) {   // sewn-on patch, Mono only
     rect(bx + 4 * face, headY - 5, 4, 4, CD);
@@ -1003,6 +1130,24 @@ function drawMonkey(cx, feetY, a, skinId) {
     ell(bx, headY - 4, 7.9, 3.9, S.hair);
     rect(bx - 8, headY - 3, 16, 2, S.hair);
     ell(bx - 3 * face, headY - 5.5, 4, 1.6, S.hairHi);
+  } else if (S.longHair) {    // brown bob falling past the ears, with a bow
+    ell(bx, headY - 3, 9, 6.2, O);
+    ell(bx, headY - 3, 8.2, 5.4, S.hair);
+    for (const s of [-1, 1]) {
+      ell(bx + s * 8, headY + 2, 3.4, 6.4, O);
+      ell(bx + s * 8, headY + 2, 2.6, 5.6, S.hair);
+      ell(bx + s * 8, headY + 7, 2.8, 2.4, O);
+      ell(bx + s * 8, headY + 7, 2, 1.7, S.hair);
+    }
+    rect(bx - 8, headY - 2, 16, 2, S.hair);
+    ell(bx - 3 * face, headY - 5, 4.2, 2, S.hairHi);
+    if (S.bow) {
+      const byy = headY - 7;
+      ell(bx + 5 * face, byy, 3, 2.4, O);
+      ell(bx + 3.5 * face, byy, 2, 1.7, S.bow);
+      ell(bx + 6.5 * face, byy, 2, 1.7, S.bow);
+      rect(bx + 5 * face - 1, byy - 1, 2, 2, '#ffd0dc');
+    }
   } else if (S.hair) {        // dark blonde mop with a fringe
     ell(bx, headY - 3.5, 8.8, 6, O);
     ell(bx, headY - 3.5, 8, 5.2, S.hair);
@@ -1010,6 +1155,14 @@ function drawMonkey(cx, feetY, a, skinId) {
     rect(bx - 8, headY - 3, 16, 2, S.hair);
     rect(bx + 5 * face, headY - 10, 2, 4, S.hair);        // cowlick
     rect(bx + 4 * face, headY - 11, 2, 2, S.hairHi);
+  }
+
+  if (S.crown) {   // fairy tiara
+    rect(bx - 5, headY - 8, 11, 1, S.crown);
+    rect(bx - 5, headY - 9, 1, 1, S.crown);
+    rect(bx + 5, headY - 9, 1, 1, S.crown);
+    rect(bx - 1, headY - 11, 3, 3, S.crown);
+    rect(bx, headY - 10, 1, 1, S.crownGem);
   }
 
   if (S.hat) {     // witch hat: brim, leaning cone, band and buckle
@@ -1065,6 +1218,23 @@ function drawMonkey(cx, feetY, a, skinId) {
     rect(ex - 2, ey - 3.5, 4, 1, S.brow);
   }
 
+  if (S.glasses) {   // round spectacles over the eyes
+    for (let i = 0; i < 2; i++) {
+      const gx = bx + (i === 0 ? -3.2 : 3.2) + face * 0.8, gy = headY - 1.5;
+      ell(gx, gy, 3.1, 3.1, S.glasses);
+      ell(gx, gy, 2.1, 2.1, 'rgba(255,255,255,0.22)');
+      rect(gx - 1, gy - 2, 1, 1, '#ffffff');
+    }
+    rect(bx - 0.2 + face * 0.8, headY - 2, 2, 1, S.glasses);
+    rect(bx - 9 + face * 0.8, headY - 2, 3, 1, S.glasses);
+    rect(bx + 7 + face * 0.8, headY - 2, 3, 1, S.glasses);
+  }
+  if (S.moustache) {
+    rect(bx - 3 + face, headY + 3, 7, 2, S.moustache);
+    rect(bx - 4 + face, headY + 3, 1, 1, S.moustache);
+    rect(bx + 4 + face, headY + 3, 1, 1, S.moustache);
+  }
+
   /* ---- front arm (drawn last so it reads in front of the body) ---- */
   const faX = bx + 3 * face, faY = shY;
   const fhX = faX + armFx * face, fhY = shY + 7 + armFy;
@@ -1072,6 +1242,20 @@ function drawMonkey(cx, feetY, a, skinId) {
   limb(faX, faY, fhX, fhY, 3, S.arm);
   ell(fhX, fhY + 1, 2.4, 2.2, O);
   ell(fhX, fhY + 1, 1.6, 1.4, S.hand);
+
+  if (S.wand) {   // star wand, held aloft, trailing sparkles
+    const wtX = fhX + 2 * face, wtY = fhY - 8;
+    limb(fhX, fhY, wtX, wtY, 3, O);
+    limb(fhX, fhY, wtX, wtY, 1, S.wand);
+    rect(wtX - 2, wtY, 5, 1, S.wandStar);
+    rect(wtX, wtY - 2, 1, 5, S.wandStar);
+    rect(wtX - 1, wtY - 1, 3, 3, S.wandStar);
+    rect(wtX - 1, wtY - 2, 1, 1, '#ffffff');
+    const sp = Math.sin(a.phase * 2.5);
+    rect(wtX + 4, wtY - 3 + sp, 1, 1, '#ffffff');
+    rect(wtX - 5, wtY + 2 - sp, 1, 1, S.wandStar);
+    rect(wtX + 2, wtY + 5 + sp, 1, 1, '#ffffff');
+  }
 
   if (S.ball) {   // basketball tucked against the front hand
     const bX = fhX + 3 * face, bY = fhY + 1;
@@ -1542,6 +1726,7 @@ function respawn() {
 const MUTE_BTN = () => ({ x: VW / 2 - 11, y: 4, w: 22, h: 16 });
 
 function inMute(x, y) {
+  if (state === 'select') return false;   // not drawn there, so not tappable
   const b = MUTE_BTN();
   return x >= b.x - 6 && x <= b.x + b.w + 6 && y >= b.y - 4 && y <= b.y + b.h + 6;
 }
@@ -2122,20 +2307,34 @@ function drawTitle(t) {
 // character later needs no layout surgery.
 /* Responsive roster: wraps into rows so it still fits a narrow portrait screen
    as the cast grows. Slots shrink once more than one row is needed. */
+const SELECT_HEAD = 18;   // room for the heading above the grid
+const SELECT_FOOT = 26;   // room for blurb + level + prompt below it
+
 function charSlots() {
   const list = unlockedList();
-  const sw = 56, gap = 5;
-  const cols = Math.max(1, Math.min(list.length, Math.floor((VW - 8) / (sw + gap))));
-  const rows = Math.ceil(list.length / cols);
-  const sh = rows > 1 ? 52 : 62;
+  const n = list.length;
+  let sw = 56, gap = 5;
+  let cols = Math.max(1, Math.min(n, Math.floor((VW - 8) / (sw + gap))));
+  let rows = Math.ceil(n / cols);
+  if (rows > 2) {          // tighten the cells once the cast needs three rows
+    sw = 44; gap = 4;
+    cols = Math.max(1, Math.min(n, Math.floor((VW - 6) / (sw + gap))));
+    rows = Math.ceil(n / cols);
+  }
+  const avail = VH - SELECT_HEAD - SELECT_FOOT;
+  let sh = rows === 1 ? 62 : 52;
+  const maxSh = Math.floor((avail - (rows - 1) * gap) / rows);
+  if (sh > maxSh) sh = Math.max(26, maxSh);
+  // too short for a whole body: show a clipped head-and-shoulders portrait
+  const bust = sh < 48;
   const totalH = rows * sh + (rows - 1) * gap;
-  const y0 = Math.round(Math.max(rows > 1 ? 32 : 40, (VH - totalH) / 2 - 2));
+  const y0 = Math.round(Math.max(SELECT_HEAD, (VH - SELECT_FOOT - totalH) / 2 + 2));
   return list.map((id, i) => {
     const r = Math.floor(i / cols), c = i % cols;
-    const inRow = Math.min(cols, list.length - r * cols);
+    const inRow = Math.min(cols, n - r * cols);
     const rowW = inRow * sw + (inRow - 1) * gap;
     const rx = Math.round(VW / 2 - rowW / 2);
-    return { id, x: rx + c * (sw + gap), y: y0 + r * (sh + gap), w: sw, h: sh, rows: rows };
+    return { id, x: rx + c * (sw + gap), y: y0 + r * (sh + gap), w: sw, h: sh, rows, bust };
   });
 }
 
@@ -2157,9 +2356,17 @@ function drawSelect(t) {
       rect(s.x, s.y, s.w, 1, c); rect(s.x, s.y + s.h - 1, s.w, 1, c);
       rect(s.x, s.y, 1, s.h, c); rect(s.x + s.w - 1, s.y, 1, s.h, c);
     }
-    drawMonkey(s.x + s.w / 2, s.y + s.h - 5, {
+    // in bust mode the body hangs below the cell, so clip it to the panel.
+    // Four-legged characters carry their head lower, so they need less drop.
+    const feet = s.bust ? s.y + s.h + (S.quad ? 4 : 11) : s.y + s.h - 5;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(s.x + 1, s.y + 1, s.w - 2, s.h - 2);
+    ctx.clip();
+    drawMonkey(s.x + s.w / 2, feet, {
       state: picked ? 'run' : 'idle', phase: t * (picked ? 9 : 2), face: 1, blink: !picked && player.blink
     }, s.id);
+    ctx.restore();
     drawTextCentered(S.name, s.x + s.w / 2, s.y + 3, 1, picked ? '#ffd34d' : P.hud, '#102118');
   }
 
@@ -2265,7 +2472,7 @@ function render() {
 
   if (state === 'play') drawHUD();
   if (state === 'title') { drawTitle(tGlobal); drawMuteBtn(); drawThemeBtn(); }
-  if (state === 'select') { drawSelect(tGlobal); drawMuteBtn(); }
+  if (state === 'select') { drawSelect(tGlobal); }   // heading occupies the mute slot
   if (state === 'complete') { drawHUD(); drawComplete(tGlobal); }
   if (state === 'over') { drawHUD(); drawOver(tGlobal); }
   drawAudioStatus();
